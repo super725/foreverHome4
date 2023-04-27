@@ -1,22 +1,35 @@
 using UnityEngine;
 using System.Collections;
+
 public class ShotgunDmg : MonoBehaviour
 {
+    public Transform bulletSpawnPoint; // Reference to the bullet spawn point.
+    public GameObject bulletPrefab; // Reference to the bullet prefab.
     public float damage = 10f;
     public float range = 100f;
     public ParticleSystem muzzleFlash;
     public int maxAmmo = 30;
     public float reloadTime = 2f;
+    public float shootCooldown = 0.5f; // Cooldown period between shots.
 
     [HideInInspector]
     public int currentAmmo;
 
     private Transform cameraTransform;
+    private bool canShoot = true; // Flag to track if shooting is allowed.
 
     void Start()
     {
         cameraTransform = Camera.main.transform;
         currentAmmo = maxAmmo;
+    }
+
+    void Update()
+    {
+        if (Input.GetButtonDown("Fire1") && canShoot)
+        {
+            Shoot();
+        }
     }
 
     public void Shoot()
@@ -35,28 +48,40 @@ public class ShotgunDmg : MonoBehaviour
 
         currentAmmo--;
 
-        // Cast multiple rays in a cone shape from the center of the screen in the direction of the camera's forward vector.
-        int numRays = 10; // number of rays to cast
-        float coneAngle = 10f; // angle of the cone in degrees
-        for (int i = 0; i < numRays; i++)
-        {
-            float angle = Random.Range(-coneAngle / 2f, coneAngle / 2f);
-            Quaternion rotation = Quaternion.AngleAxis(angle, cameraTransform.right);
-            Vector3 direction = rotation * cameraTransform.forward;
+        // Spawn the bullet prefab at the bullet spawn point position and rotation.
+        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
+        Rigidbody bulletRigidbody = bullet.GetComponent<Rigidbody>();
 
-            Ray ray = new Ray(cameraTransform.position, direction);
-            if (Physics.Raycast(ray, out RaycastHit hit, range))
+        // Set the bullet's velocity to move straight in the shooting direction.
+        if (bulletRigidbody != null)
+        {
+            bulletRigidbody.velocity = bulletSpawnPoint.forward * range;
+        }
+
+        // Cast a ray from the bullet spawn point in the direction of its forward vector.
+        Ray ray = new Ray(bulletSpawnPoint.position, bulletSpawnPoint.forward);
+        if (Physics.Raycast(ray, out RaycastHit hit, range))
+        {
+            // Apply damage to the hit object if it has a collider.
+            if (hit.collider != null)
             {
-                // Apply damage to the hit object if it has a collider.
-                if (hit.collider != null)
+                Enemy enemy = hit.collider.gameObject.GetComponent<Enemy>();
+                if (enemy != null)
                 {
-                    Enemy enemy = hit.collider.gameObject.GetComponent<Enemy>();
-                    if (enemy != null)
-                    {
-                        enemy.TakeDamage(damage);
-                    }
+                    enemy.TakeDamage(damage);
                 }
             }
         }
+
+        canShoot = false; // Disable shooting temporarily.
+        StartCoroutine(EnableShootingAfterCooldown()); // Enable shooting after the cooldown period.
+
+        Destroy(bullet, 0.5f); // Destroy the bullet after half a second
+    }
+
+    IEnumerator EnableShootingAfterCooldown()
+    {
+        yield return new WaitForSeconds(shootCooldown); // Wait for the cooldown period.
+        canShoot = true; // Enable shooting.
     }
 }
