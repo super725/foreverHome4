@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,9 +20,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private bool canUseHeadbob = true;
     [SerializeField] private bool willSlideOnSlopes = true;
     [SerializeField] private bool canZoom = true;
-    
-    
-    
+    [SerializeField] private bool useStamina = true; 
 
     [Header("Controls")] 
     [SerializeField] private KeyCode sprintKey = KeyCode.LeftShift;
@@ -30,6 +29,29 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private KeyCode zoomKey = KeyCode.Mouse1;
 
     
+    [Header("Health Prameters")]
+    [SerializeField]private float maxHealth = 100;
+    [SerializeField]private float timeBeforeRegenStarts = 3.0f;
+    [SerializeField]private float healthValueIncrement = 1;
+    [SerializeField]private float healthTimeIncrement = 0.1f;
+    private float currentHealth;
+    private Coroutine regenertingHealth;
+    public static Action<float> OnTakeDamage;
+    public static Action<float> OnDamage;
+    public static Action<float> OnHeal;
+
+    [Header("Stamina Parameters")] 
+    [SerializeField] private float maxStamina = 100;
+    [SerializeField] private float staminaUseMultiplier = 5;
+    [SerializeField] private float timeBeforeStaminaRegen = 5;
+    [SerializeField] private float staminaValueIncrement = 2;
+    [SerializeField] private float staminaTimeIncrement = 0.1f;
+    private float currentStamina;
+    private Coroutine regenerateStamina;
+    public static Action<float> OnStaminaChange;
+
+
+
     [Header("Movement Parameters")] 
     [SerializeField]private float walkSpeed = 3.0f;
     [SerializeField]private float sprintSpeed = 6.0f;
@@ -99,13 +121,26 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 moveDirection;
     private Vector2 currentInput;
 
-    private float rotationX = 0; 
+    private float rotationX = 0;
+
+    private void OnEnable()
+    {
+        OnTakeDamage += ApplyDamage;
+    }
+
+    private void OnDisable()
+    {
+        OnTakeDamage -= ApplyDamage;
+    }
+
     void Awake()
     {
         playerCamera = GetComponentInChildren<Camera>();
         characterController = GetComponent<CharacterController>();
         defaultYPos = playerCamera.transform.localPosition.y;
         defaultFOV = playerCamera.fieldOfView;
+        currentHealth = maxHealth;
+        currentStamina = maxStamina;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -130,7 +165,8 @@ public class FirstPersonController : MonoBehaviour
             if (canZoom)
                 HandleZoom();
 
-
+            if (useStamina)
+                HandleStamina();
 
             ApplyFinalMovements();
         }   
@@ -182,6 +218,58 @@ public class FirstPersonController : MonoBehaviour
                 playerCamera.transform.localPosition.z
             );
         }
+    }
+
+    private void HandleStamina()
+    {
+        if (isSprinting && currentInput != Vector2.zero)
+        {
+            if (regenerateStamina != null)
+            {
+                StopCoroutine(regenerateStamina);
+                    regenerateStamina = null;
+            }
+            currentStamina -= staminaUseMultiplier * Time.deltaTime;
+
+            if (currentStamina < 0)
+                currentStamina = 0;
+            
+            OnStaminaChange?.Invoke(currentStamina);
+
+            if (currentStamina <= 0)
+                canSprint = false;
+        }
+
+        if (!isSprinting && currentStamina < maxStamina && regenerateStamina == null)
+        {
+            regenerateStamina = StartCoroutine(RegenerateStamina());
+        }
+    }
+
+    private void ApplyDamage(float dmg)
+    {
+        currentHealth -= dmg;
+        OnDamage?.Invoke(currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            KillPlayer();
+        }else if (regenertingHealth != null)
+        {
+            StopCoroutine(regenertingHealth);
+        }
+
+        regenertingHealth = StartCoroutine(RegenerateHealth()); 
+    }
+
+    private void KillPlayer()
+    {
+        currentHealth = 0;
+        if(regenertingHealth != null)
+            StopCoroutine(regenertingHealth);
+    
+        //Add a death screen
+        print("Dead");
     }
 
     private void HandleZoom()
@@ -265,5 +353,47 @@ public class FirstPersonController : MonoBehaviour
 
         playerCamera.fieldOfView = targetFOV;
         zoomRoutine = null; 
+    }
+
+    private IEnumerator RegenerateHealth()
+    {
+        yield return new WaitForSeconds(timeBeforeRegenStarts);
+        WaitForSeconds timeToWait = new WaitForSeconds(healthTimeIncrement);
+
+        while (currentHealth < maxHealth)
+        {
+            currentHealth += healthValueIncrement;
+
+            if (currentHealth > maxHealth)
+                currentHealth = maxHealth;
+            
+            OnHeal?.Invoke(currentHealth);
+            yield return timeToWait;
+        }
+
+        regenertingHealth = null; 
+    }
+
+    private IEnumerator RegenerateStamina()
+    {
+        yield return new WaitForSeconds(timeBeforeStaminaRegen);
+        WaitForSeconds timeToWait = new WaitForSeconds(staminaTimeIncrement);
+
+        while (currentStamina < maxStamina)
+        {
+            if (currentStamina > 0)
+                canSprint = true;
+            
+            currentStamina += staminaValueIncrement;
+
+            if (currentStamina > maxStamina)
+                currentStamina = maxStamina;
+            
+            OnStaminaChange?.Invoke(currentStamina);
+            
+            yield return timeToWait;
+        }
+
+        regenerateStamina = null;
     }
 }
