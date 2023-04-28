@@ -53,6 +53,9 @@ public class FirstPersonController : MonoBehaviour
     public static Action<float> OnStaminaChange;
 
 
+    // [Header("Inventory Parameters")]
+    //  public Inventory inventory;
+
 
     [Header("Movement Parameters")] 
     [SerializeField]private float walkSpeed = 3.0f;
