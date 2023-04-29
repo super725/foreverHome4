@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: e2f08b89511ddd54bafea08db35b4b22
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - texture1: {fileID: 2800000, guid: e3fd5ddc356605a4e80dc3d802e993a4, type: 3}
+  - texture2: {fileID: 2800000, guid: 1d6eb39dd37b8ee41ab5b6970b9ca418, type: 3}
+  - noiseMapGeneration: {fileID: 8829549807075289011, guid: a544656acd4e44844a387a94b9dd7f4b, type: 3}
+  - tileRenderer: {fileID: 348058875314249110, guid: a544656acd4e44844a387a94b9dd7f4b, type: 3}
+  - meshFilter: {fileID: 9059919637609753902, guid: a544656acd4e44844a387a94b9dd7f4b, type: 3}
+  - meshCollider: {fileID: 4265569730808766650, guid: a544656acd4e44844a387a94b9dd7f4b, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
