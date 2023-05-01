@@ -28,7 +28,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
     [SerializeField] private KeyCode zoomKey = KeyCode.Mouse1;
-    [SerializeField] private KeyCode interactKey = KeyCode.E;
+    [SerializeField] private KeyCode interactKey = KeyCode.F;
 
     
     [Header("Health Prameters")]
@@ -53,8 +53,8 @@ public class FirstPersonController : MonoBehaviour
     public static Action<float> OnStaminaChange;
 
 
-    // [Header("Inventory Parameters")]
-    //  public Inventory inventory;
+    [Header("Inventory Parameters")]
+     public Inventory inventory;
 
 
     [Header("Movement Parameters")] 
@@ -84,6 +84,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private Vector3 standingCenter = new Vector3(0,0,0);
     private bool isCrouching;
     private bool duringCrouchAnimation;
+    private float originalHeight;
     
     [Header("Headbob Parameters")]
     [SerializeField] private float walkBobSpeed = 14f;
@@ -145,6 +146,12 @@ public class FirstPersonController : MonoBehaviour
         OnTakeDamage -= ApplyDamage;
     }
 
+    private void Start()
+    {
+        characterController = GetComponent<CharacterController>();
+        originalHeight = characterController.height;
+    }
+
     void Awake()
     {
         playerCamera = GetComponentInChildren<Camera>();
@@ -185,7 +192,11 @@ public class FirstPersonController : MonoBehaviour
                 HandleInteractionCheck();
                 HandleInteractionInput();
             }
-                
+
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                ToggleCursorLock();
+            }
 
             ApplyFinalMovements();
         }   
@@ -209,6 +220,20 @@ public class FirstPersonController : MonoBehaviour
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
         
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeedX, 0);
+    }
+
+    private void ToggleCursorLock()
+    {
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     private void HandleJump()
@@ -364,15 +389,18 @@ public class FirstPersonController : MonoBehaviour
         duringCrouchAnimation = true;
 
         float timeElapsed = 0;
-        float targetHeight = isCrouching ? standingHeight : crouchHeight;
+        float targetHeight = originalHeight;
         float currentHeight = characterController.height;
         Vector3 targetCenter = isCrouching ? standingCenter : crouchingCenter;
         Vector3 currentCenter = characterController.center;
 
         while (timeElapsed < timetoCrouch)
         {
-            characterController.height = Mathf.Lerp(currentHeight, targetHeight, timeElapsed / timetoCrouch);
-            characterController.center = Vector3.Lerp(currentCenter, targetCenter, timeElapsed / timetoCrouch);
+            float t = timeElapsed / timetoCrouch;
+            t = t * t * (3f - 2f * t);
+            
+            characterController.height = Mathf.Lerp(currentHeight, targetHeight, t);
+            characterController.center = Vector3.Lerp(currentCenter, targetCenter, t);
             timeElapsed += Time.deltaTime;
             yield return null; 
         }
@@ -381,6 +409,7 @@ public class FirstPersonController : MonoBehaviour
         characterController.center = targetCenter;
 
         isCrouching = !isCrouching;
+        
         
         duringCrouchAnimation = false;
     }
@@ -442,5 +471,14 @@ public class FirstPersonController : MonoBehaviour
         }
 
         regenerateStamina = null;
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        IInventoryItem item = hit.collider.GetComponent<IInventoryItem>();
+        if (item != null)
+        {
+            inventory.AddItem(item);
+        }
     }
 }

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7564356346683508501}
   - component: {fileID: 6477986707368434403}
   - component: {fileID: 7985035118800426268}
-  - component: {fileID: 2100717149690150590}
+  - component: {fileID: 955797398976454329}
   m_Layer: 6
   m_Name: CapBellShaped_StalkBolbous_LOD0_Type03
   m_TagString: Untagged
@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816a0a7054ef0a34585d4090dc636274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2100717149690150590
+--- !u!114 &955797398976454329
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

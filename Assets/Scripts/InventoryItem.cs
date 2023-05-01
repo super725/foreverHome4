@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public interface IInventoryItem
 {
    string Name { get; }
@@ -10,6 +11,8 @@ public interface IInventoryItem
    Sprite Image { get; }
 
    void OnPickup();
+
+   void OnDrop();
 }
 
 public class InventoryEventArgs : EventArgs

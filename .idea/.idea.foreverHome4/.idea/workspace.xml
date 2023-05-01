@@ -2,21 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4ed24d13-3861-4d29-9ae2-768ca04d4a3c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Imported Asset Collection/Mushroom Colored/PreFab/Mushroom/CapBell_StalkBolbous/CapBell_StalkBolbous_01/CapBellShaped_StalkBolbous_LOD0_Type01.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Imported Asset Collection/Mushroom Colored/PreFab/Mushroom/CapBell_StalkBolbous/CapBell_StalkBolbous_01/CapBellShaped_StalkBolbous_LOD0_Type01.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.foreverHome4/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.foreverHome4/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Imported Asset Collection/Mushroom Colored/PreFab/Mushroom/CapBell_StalkBolbous/CapBell_StalkBolbous_03/CapBellShaped_StalkBolbous_LOD0_Type03.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Imported Asset Collection/Mushroom Colored/PreFab/Mushroom/CapBell_StalkBolbous/CapBell_StalkBolbous_03/CapBellShaped_StalkBolbous_LOD0_Type03.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Imported Asset Collection/Tree Stumps/Scan Stump Vol.1/Models/Stump_fresh_Billboard_Normal.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Imported Asset Collection/Tree Stumps/Scan Stump Vol.1/Models/Stump_fresh_Billboard_Normal.png.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Imported Asset Collection/Tree Stumps/Scan Stump Vol.1/Models/Stump_nobark_Billboard_Normal.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Imported Asset Collection/Tree Stumps/Scan Stump Vol.1/Models/Stump_nobark_Billboard_Normal.png.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Imported Asset Collection/Tree Stumps/Scan Stump Vol.1/Models/Stump_old2_Billboard_Normal.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Imported Asset Collection/Tree Stumps/Scan Stump Vol.1/Models/Stump_old2_Billboard_Normal.png.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Imported Asset Collection/Tree Stumps/Scan Stump Vol.1/Models/Stump_old_Billboard_Normal.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Imported Asset Collection/Tree Stumps/Scan Stump Vol.1/Models/Stump_old_Billboard_Normal.png.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Imported Asset Collection/Tree Stumps/Scan Stump Vol.1/Models/Stump_two_Billboard_Normal.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Imported Asset Collection/Tree Stumps/Scan Stump Vol.1/Models/Stump_two_Billboard_Normal.png.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Home.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Home.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/FirstPersonController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FirstPersonController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/TestInteractable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/TestInteractable.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/HUD.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/HUD.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Inventory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Inventory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/InventoryItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/InventoryItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Items/mushroom.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Items/mushroom.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.probuilder/Settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.probuilder/Settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectVersion.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectVersion.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/boot.config" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserSettings/Layouts/default-2022.dwlt" beforeDir="false" afterPath="$PROJECT_DIR$/UserSettings/Layouts/default-2022.dwlt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +24,8 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Interaction.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Inventory.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/InventoryItem.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/ItemDragHandler.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Items/Axe.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Items/mushroom.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -106,6 +104,9 @@
       <workItem from="1682657844180" duration="102000" />
       <workItem from="1682657978763" duration="626000" />
       <workItem from="1682658648335" duration="1089000" />
+      <workItem from="1682905737750" duration="227000" />
+      <workItem from="1682905993001" duration="135000" />
+      <workItem from="1682906151158" duration="9628000" />
     </task>
     <servers />
   </component>
