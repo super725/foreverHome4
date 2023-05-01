@@ -9,6 +9,9 @@ public class LevelGeneration : MonoBehaviour
     [Header("Level Properties")] 
     public int mapWidthInTiles;
     public int mapDepthInTiles;
+
+    [Header("Prefab List")] 
+    public GameObject[] prefabs;
         
     [Header("Texture Properties")]
     public GameObject tilePrefab;
@@ -16,22 +19,24 @@ public class LevelGeneration : MonoBehaviour
     public Texture2D texture1, texture2;
     public AnimationCurve blendCurve;
     
-    [Header("HeightMap Perlin Noise")]
+    [Header("Height Map Perlin Noise")]
     public float levelScale;
     public float heightMultiplier;
     public AnimationCurve heightCurve;
     public Wave[] heightWave, scatterWave;
     
-    [Header("ScatterMap Properties")] 
+    [Header("Scatter Map Properties")] 
     public float scatterDensity;
     public float scatterRadius;
-
+    
     [Header("Miscellaneous")]
     public GameObject playerPrefab;
-    
+
     private Transform myTransform;
     private Vector3 myPosition;
-    private int tileWidth, tileDepth;
+    
+    [NonSerialized]
+    public int tileWidth, tileDepth;
 
     void Start()
     {
@@ -56,17 +61,20 @@ public class LevelGeneration : MonoBehaviour
         }
         yield return 0; // Raycast collision doesnt work until after the mesh generation frame
         
-        Vector3 playerPos = new Vector3(myPosition.x + mapWidthInTiles * tileWidth / 2f - tileWidth/2f, myPosition.y + 10, myPosition.z + mapDepthInTiles * tileDepth / 2f  - tileDepth/2f);
-        RaycastHit hit;
-        Ray ray = new(playerPos, Vector3.down);
 
-        if (Physics.Raycast(ray, out hit, 15f))
+        Vector2 centerPos = new(mapWidthInTiles * tileWidth / 2f, mapDepthInTiles * tileDepth / 2f);
+        InstantiateObjectInMap(playerPrefab, centerPos.x, centerPos.y);
+    }
+    
+    private void InstantiateObjectInMap(GameObject prefab, float x, float y)
+    {
+        Vector3 pos = transform.position;
+        Vector3 prefabPos = new(pos.x + x - tileWidth/2f + 0.5f, pos.y + 10, pos.z + y - tileDepth/2f + 0.5f);
+        Ray ray = new(prefabPos, Vector3.down);
+        if (Physics.Raycast(ray, out var hit, 15f))
         {
-            Debug.Log(hit.collider.name);
-            Debug.DrawRay(playerPos, hit.point-playerPos, Color.red, 5f);
-            playerPos = hit.point + Vector3.up;
+            prefabPos = hit.point + Vector3.up;
         }
-        
-        Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        Instantiate(prefab, prefabPos, Quaternion.identity);
     }
 }

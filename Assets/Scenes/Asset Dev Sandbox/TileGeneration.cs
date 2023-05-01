@@ -19,8 +19,9 @@ public class TileGeneration : MonoBehaviour
 	private Wave[] heightWave, scatterWave;
 	
 	public NoiseMapGeneration noiseMapGeneration;
-	
-	public GameObject treePrefab, spherePrefab;
+
+	private GameObject[] prefabs;
+	//public GameObject treePrefab, spherePrefab;
 	
 	[SerializeField] private MeshRenderer tileRenderer;
 	[SerializeField] private MeshFilter meshFilter;
@@ -42,7 +43,11 @@ public class TileGeneration : MonoBehaviour
 		scatterWave = args.scatterWave;
 		scatterRadius = args.scatterRadius;
 		scatterDensity = args.scatterDensity;
+		prefabs = args.prefabs;
 		
+		Vector3 tileSize = GetComponent<MeshRenderer>().bounds.size;
+		tileWidth = (int)tileSize.x;
+		tileDepth = (int)tileSize.z;
 		StartCoroutine(nameof(GenerateTile));
 	}
 
@@ -56,22 +61,31 @@ public class TileGeneration : MonoBehaviour
 		float[,] heightMap = GenerateHeightMap(offsetX, offsetZ);
 		UpdateMeshVertices(heightMap); // Use new heightmap as our vertices' y values.
 		
-		//yield return new WaitForSeconds(0.1f);
 		yield return 0;
 		
+		// Scatters prefabs randomly across a single tile. No stacking, but collisions possible atm
+		NonParityScatter(prefabs[0], scatterDensity);
 		
-		
+		// Scatters prefabs according to Perlin Noise peaks. Keeps the same generation pattern / Uses wave data
 		float[,] scatterMap = GenerateScatterMap(offsetX, offsetZ);
+		ParityScatter(prefabs[1], scatterMap, scatterRadius);
 		
-		nonParityScatter(scatterMap, scatterDensity);
 		
-		GenerateTrees(scatterMap, scatterRadius);
+		// List-Based prefab scattering
+		for (int i = 2; i < prefabs.Length; i++)
+		{
+			float[,] generativeMap = GenerateScatterMap(offsetX+i, offsetZ+i);
+			ParityScatter(prefabs[i], generativeMap, scatterRadius);
+		}
+		
 		
 		yield return 0;
 		
 		// build a Texture2D from the height map
 		Texture2D tileTexture = BuildTexture (heightMap);
 		tileRenderer.material.mainTexture = tileTexture;
+		tileRenderer.material.SetFloat("_Metallic",0.75f);
+		tileRenderer.material.SetFloat("_Glossiness",0.25f);
 	}
 
 	private float[,] GenerateHeightMap(float offsetX, float offsetZ) {
@@ -91,7 +105,6 @@ public class TileGeneration : MonoBehaviour
 		return noiseMapGeneration.GenerateNoiseMap (tileMeshDepth, tileMeshWidth, levelScale, offsetX, offsetZ, scatterWave);
 	}
 	
-	
 	private Texture2D BuildTexture(float[,] heightMap) {
 		// Height map resolution is mesh vertex resolution
 		// Texture resolution will be different from heightmap resolution
@@ -100,16 +113,16 @@ public class TileGeneration : MonoBehaviour
 		int heightMapWidth = (int)Mathf.Sqrt(heightMap.Length);
 		int textureWidth = Mathf.Min(tileResolution, texture1.width);
 		
-		float texturescaleFactor = (float)texture1.width / textureWidth;
+		float textureScaleFactor = (float)texture1.width / textureWidth;
 		float heightScaleFactor = (float)textureWidth / heightMapWidth;
 		
-		float[,] hiResHeight = UpsampleFloat2DArray(heightMap, heightScaleFactor);
+		float[,] hiResHeight = UpSampleFloat2DArray(heightMap, heightScaleFactor);
 
-		Debug.Log($"Original Texture Resolution: {texture1.width}");
-		Debug.Log($"Original Heightmap Resolution: {heightMapWidth}");
-		Debug.Log($"Selected Texture Resolution: {textureWidth}");
-		Debug.Log($"Height Map -> Texture Scale Factor: {heightScaleFactor}");
-		Debug.Log($"Texture Down-sampling Factor: {texturescaleFactor}");
+		// Debug.Log($"Original Texture Resolution: {texture1.width}");
+		// Debug.Log($"Original Heightmap Resolution: {heightMapWidth}");
+		// Debug.Log($"Selected Texture Resolution: {textureWidth}");
+		// Debug.Log($"Height Map -> Texture Scale Factor: {heightScaleFactor}");
+		// Debug.Log($"Texture Down-sampling Factor: {textureSaleFactor}");
 
 		Color[] colorMap = new Color[textureWidth * textureWidth];
 
@@ -119,22 +132,24 @@ public class TileGeneration : MonoBehaviour
 				int colorIndex = zIndex * textureWidth + xIndex;
 
 				float heightWeight = blendCurve.Evaluate(hiResHeight[zIndex, xIndex]);
-				Vector2Int scaledUV = new((int)(zIndex * texturescaleFactor), (int)(xIndex * texturescaleFactor));
+				Vector2Int scaledUV = new((int)(zIndex * textureScaleFactor), (int)(xIndex * textureScaleFactor));
 				
 				colorMap[colorIndex] =  Color.Lerp(texture2.GetPixel(scaledUV.x, scaledUV.y), texture1.GetPixel(scaledUV.x, scaledUV.y), heightWeight);
 			}
 		}
 
 		// create a new texture and set its pixel colors
-		Texture2D tileTexture = new Texture2D (textureWidth, textureWidth);
-		tileTexture.wrapMode = TextureWrapMode.Repeat;
+		Texture2D tileTexture = new Texture2D (textureWidth, textureWidth)
+		{
+			wrapMode = TextureWrapMode.Repeat
+		};
 		tileTexture.SetPixels (colorMap);
 		tileTexture.Apply();
 
 		return tileTexture;
 	}
 	
-	private static float[,] UpsampleFloat2DArray(float[,] inputArray, float scaleFactor)
+	private static float[,] UpSampleFloat2DArray(float[,] inputArray, float scaleFactor)
 	{
 		int inputWidth = inputArray.GetLength(0);
 		int inputHeight = inputArray.GetLength(1);
@@ -174,22 +189,21 @@ public class TileGeneration : MonoBehaviour
 	
 	
 	private void UpdateMeshVertices(float[,] heightMap) {
-		int tileDepth = heightMap.GetLength (0);
-		int tileWidth = heightMap.GetLength (1);
-
+		int heightMeshDepth = heightMap.GetLength (0);
+		int heightMeshWidth = heightMap.GetLength (1);
+		
 		Mesh mesh = meshFilter.mesh;
 		Vector3[] meshVertices = mesh.vertices;
 
 		// iterate through all the heightMap coordinates, updating the vertex index
 		int vertexIndex = 0;
-		for (int zIndex = 0; zIndex < tileDepth; zIndex++) {
-			for (int xIndex = 0; xIndex < tileWidth; xIndex++) {
+		for (int zIndex = 0; zIndex < heightMeshDepth; zIndex++) {
+			for (int xIndex = 0; xIndex < heightMeshWidth; xIndex++) {
 				float height = heightMap [zIndex, xIndex];
 
 				Vector3 vertex = meshVertices [vertexIndex];
 				// change the vertex Y coordinate, proportional to the height value. The height value is evaluated by the heightCurve function, in order to correct it.
 				meshVertices[vertexIndex] = new Vector3(vertex.x, heightCurve.Evaluate(height) * heightMultiplier, vertex.z);
-
 				vertexIndex++;
 			}
 		}
@@ -202,23 +216,32 @@ public class TileGeneration : MonoBehaviour
 		meshCollider.sharedMesh = mesh;
 	}
 	
-	 private void GenerateTrees(float[,] matrix, float density) {
-		int scatterLength = matrix.GetLength(0);
-		int scatterWidth = matrix.GetLength(1);
-		int r = (int)(density / 100f) * scatterLength;
-		//int r = (int)density;
-		 r = 11;
-		Debug.Log($"Density: {r}");
+	 private void ParityScatter(GameObject prefab, float[,] matrix, float value) {
+		 if (value > 100)
+		 {
+			 // Ex. input is 175 = 25% chance of spawn per tile
+			 int chance = (int)value - 100;
+			 if (Random.Range(0, 100) < chance)
+			 {
+				 return;
+			 }
+		 }
+		 
+		 int r = (int)(value / 100f * Math.Sqrt(tileWidth * tileDepth)); // radius of comparison (from percentage/100 to ratio of radius/tilesize)
+		 
+		 // Debug.Log($"Raw input: {value}");
+		 // Debug.Log($"Tile Size: {Math.Sqrt(tileWidth * tileDepth)}");
+		 // Debug.Log($"Parity Scatter Radius: { r }/{  Math.Sqrt(tileWidth * tileDepth) }");
 
-		// For every value in 2d arr
-		for (int i = 0; i < scatterLength; i++) {
-			for (int j = 0; j < scatterWidth; j++) {
-			    float max = matrix[i, j];
+		 // For every value in 2d arr
+		for (int i = 0; i < tileWidth; i++) {
+			for (int j = 0; j < tileDepth; j++) {
+			    float max = matrix[i, j]; // Start with our current value
 			    
 			    // For every value in 2d arr, check neighbors up to r away
 				for (int ii = i - r; ii <= i + r; ii++) {
 	 				for (int jj = j - r; jj <= j + r; jj++) {
-	 					if (ii >= 0 && jj >= 0 && ii < scatterLength && jj < scatterWidth) {
+	 					if (ii >= 0 && jj >= 0 && ii < tileWidth && jj < tileDepth) {
 			                // If it is bigger, save its location to compare to our own
 	 						float val = matrix[ii, jj];
 	 						if (val > max) {
@@ -230,27 +253,15 @@ public class TileGeneration : MonoBehaviour
 				
 			    // Max is now the biggest number in our radius. If its equal to our value, we are the biggest. Instantiate.
 			    if(Mathf.Approximately(max, matrix[i, j])){
-					Vector3 treePos = new(transform.position.x + i - scatterWidth/2f + 0.5f, transform.position.y + 10, transform.position.z + j - scatterWidth/2f + 0.5f);
-
-					Ray ray = new(treePos, Vector3.down);
-					if (Physics.Raycast(ray, out var hit, 15f))
-	 				{
-	 					treePos = hit.point;
-	 				}
-	 				Instantiate(treePrefab, treePos, Quaternion.identity);
-				}
+				    InstantiateAtTilePosition(prefab, i, j);
+			    }
 			}
 		}
 	 }
 
-	 private void nonParityScatter(float[,] matrix, float density)
+	 private void NonParityScatter(GameObject prefab, float density)
 	 {
-		 int scatterLength = matrix.GetLength(0);
-		 int scatterWidth = matrix.GetLength(1);
-		 int n = 0;
-		 
-		 
-		 // decimal density decider
+		 int n; // decimal density decider (for values less than 1/tile)
 		 if (density < 1f)
 		 {
 			 float chance = Random.Range(0f, 1f);
@@ -262,30 +273,39 @@ public class TileGeneration : MonoBehaviour
 		 }
 		 else
 		 {
-			 n = (int)(density/100f * scatterLength * scatterWidth);
+			 n = (int)(density/100f * tileWidth * tileDepth);
 		 }
-		 
 		 
 		 // Random Per Tile
 		 // convert into decimal, then multiply by total slots (width*length)
-
-		 List<KeyValuePair<int,int>> distribution = new List<KeyValuePair<int,int>>();
-		
+		 List<KeyValuePair<float,float>> distribution = new();
 		 while (distribution.Count < n) {
-			 int a = Random.Range(0, scatterLength);
-			 int b = Random.Range(0, scatterWidth);
-			 KeyValuePair<int, int> pair = new (a, b);
+			 float a = Random.Range(0f, tileWidth);
+			 float b = Random.Range(0f, tileDepth);
+			 KeyValuePair<float, float> pair = new (a, b);
 			 if (!distribution.Contains(pair))
 			 {
 				 distribution.Add(pair);
-				 Vector3 spherePos = new(transform.position.x + a - scatterLength/2f + 0.5f, transform.position.y + 10, transform.position.z + b - scatterWidth/2f + 0.5f);
-				 Ray ray2 = new(spherePos, Vector3.down);
-				 if (Physics.Raycast(ray2, out var hit2, 15f))
-				 {
-					 spherePos = hit2.point;
-				 }
-				 Instantiate(spherePrefab, spherePos, Quaternion.identity);
+				 InstantiateAtTilePosition(prefab, a, b);
 			 }
+		 }
+	 }
+
+	 private void InstantiateAtTilePosition(GameObject prefab, float x, float y)
+	 {
+		 Vector3 pos = transform.position;
+		 Vector3 prefabPos = new(pos.x + x - tileWidth/2f + 0.5f, pos.y + 10, pos.z + y - tileDepth/2f + 0.5f);
+		 Ray ray = new(prefabPos, Vector3.down);
+		 if (Physics.Raycast(ray, out var hit, 15f))
+		 {
+			 if (!hit.collider.gameObject.CompareTag("Floor"))
+			 {
+				 return;
+			 }
+			 prefabPos = hit.point;
+			 
+			 Instantiate(prefab, prefabPos, Quaternion.LookRotation(hit.normal)).transform.Rotate(90,0,0);;
+			 //Debug.DrawRay(prefabPos, hit.normal * 4, Color.red, 55f);
 		 }
 	 }
 }

@@ -46,6 +46,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapWidthInTiles: 5
   mapDepthInTiles: 5
+  prefabs:
+  - {fileID: 7635200367818325309, guid: 528948f82bd631f469d810eeaa5f0363, type: 3}
+  - {fileID: 1423418158973972958, guid: c3122f7f19ceec74eb3535307538bbea, type: 3}
+  - {fileID: 4182006956923407632, guid: b802c65ee9f1dee44853806281a62daa, type: 3}
+  - {fileID: 6315343221154359974, guid: e126b4d0925675c4eae9d7de49d4e8c9, type: 3}
+  - {fileID: 1120737898783828, guid: 1fdfc37f91a411548a5f4dcd69f7ecae, type: 3}
+  - {fileID: 1917267061540446, guid: 0d43cd9f23f59cf45afa1e0ef18a1f7b, type: 3}
+  - {fileID: 1850958170450966, guid: d76f2e1bf7fab564e9e6c1b23b478f77, type: 3}
+  - {fileID: 1625319614422634, guid: 5b80a1c9d2d3aa24788f50e40a512560, type: 3}
+  - {fileID: 1467130655066442, guid: bfa3cc1e2c9222848a50ba17f8e0d64b, type: 3}
+  - {fileID: 1279173378429844, guid: 7466aed51a929984cb8910d0ba6cc37b, type: 3}
   tilePrefab: {fileID: 7599130829288090861, guid: a544656acd4e44844a387a94b9dd7f4b, type: 3}
   tileResolution: 128
   texture1: {fileID: 2800000, guid: e3fd5ddc356605a4e80dc3d802e993a4, type: 3}
@@ -84,7 +95,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   levelScale: 15
-  heightMultiplier: 15
+  heightMultiplier: 6
   heightCurve:
     serializedVersion: 2
     m_Curve:
