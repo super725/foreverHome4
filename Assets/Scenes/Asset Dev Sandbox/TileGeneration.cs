@@ -300,7 +300,7 @@ public class TileGeneration : MonoBehaviour
 			 if (hit.collider.gameObject.CompareTag("Floor"))
 			 {
 				 // Place our object, rotate it to face correctly, and then scale it according to a bell curve
-				 GameObject placedPrefab = Instantiate(prefab.prefab, hit.point, Quaternion.LookRotation(hit.normal));
+				 GameObject placedPrefab = Instantiate(prefab.prefab, hit.point, Quaternion.LookRotation(hit.normal), transform);
 				 placedPrefab.transform.Rotate(0, 0, Random.Range(0f,360f), Space.Self);
 				 placedPrefab.transform.Rotate(90, 0, 0, Space.Self);
 

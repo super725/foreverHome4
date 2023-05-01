@@ -1158,7 +1158,7 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   tilePrefab: {fileID: 7599130829288090861, guid: a544656acd4e44844a387a94b9dd7f4b, type: 3}
-  tileResolution: 512
+  tileResolution: 128
   texture1: {fileID: 2800000, guid: e3fd5ddc356605a4e80dc3d802e993a4, type: 3}
   texture2: {fileID: 2800000, guid: 1d6eb39dd37b8ee41ab5b6970b9ca418, type: 3}
   blendCurve:
