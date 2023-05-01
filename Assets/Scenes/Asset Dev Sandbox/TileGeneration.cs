@@ -314,11 +314,11 @@ public class TileGeneration : MonoBehaviour
 							 break;
 						 case "ColorShroom":
 							 scaleFactor = 17f;
-							 placedPrefab.transform.Translate(0,-1,0,Space.Self);
+							 placedPrefab.transform.Translate(0,-1.5f,0,Space.Self);
 							 break;
 						 case "BigShroom":
 							 scaleFactor = 8f;
-							 placedPrefab.transform.Translate(0,-1,0,Space.Self);
+							 placedPrefab.transform.Translate(0,-1.5f,0,Space.Self);
 							 break;
 						 case "Bush":
 							 scaleFactor = 4f;
