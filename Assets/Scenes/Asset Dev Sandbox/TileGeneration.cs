@@ -20,7 +20,7 @@ public class TileGeneration : MonoBehaviour
 	
 	public NoiseMapGeneration noiseMapGeneration;
 
-	private GameObject[] prefabs;
+	private Prefab[] prefabs;
 	//public GameObject treePrefab, spherePrefab;
 	
 	[SerializeField] private MeshRenderer tileRenderer;
@@ -28,7 +28,9 @@ public class TileGeneration : MonoBehaviour
 	[SerializeField] private MeshCollider meshCollider;
 
 	private float tileWidth, tileDepth, scatterDensity, scatterRadius;
-	
+	private static readonly int Metallic = Shader.PropertyToID("_Metallic");
+	private static readonly int Glossiness = Shader.PropertyToID("_Glossiness");
+
 	void Start()
 	{
 		LevelGeneration args = GetComponentInParent<LevelGeneration>();
@@ -63,29 +65,25 @@ public class TileGeneration : MonoBehaviour
 		
 		yield return 0;
 		
+		// build a Texture2D from the height map
+		Texture2D tileTexture = BuildTexture (heightMap);
+		tileRenderer.material.mainTexture = tileTexture;
+		tileRenderer.material.SetFloat(Metallic,0.15f);
+		tileRenderer.material.SetFloat(Glossiness,0.15f);
+		
 		// Scatters prefabs randomly across a single tile. No stacking, but collisions possible atm
 		NonParityScatter(prefabs[0], scatterDensity);
 		
 		// Scatters prefabs according to Perlin Noise peaks. Keeps the same generation pattern / Uses wave data
 		float[,] scatterMap = GenerateScatterMap(offsetX, offsetZ);
-		ParityScatter(prefabs[1], scatterMap, scatterRadius);
+		ParityScatter(prefabs[2], scatterMap, scatterRadius);
 		
-		
-		// List-Based prefab scattering
+		//List-Based prefab scattering
 		for (int i = 2; i < prefabs.Length; i++)
 		{
 			float[,] generativeMap = GenerateScatterMap(offsetX+i, offsetZ+i);
 			ParityScatter(prefabs[i], generativeMap, scatterRadius);
 		}
-		
-		
-		yield return 0;
-		
-		// build a Texture2D from the height map
-		Texture2D tileTexture = BuildTexture (heightMap);
-		tileRenderer.material.mainTexture = tileTexture;
-		tileRenderer.material.SetFloat("_Metallic",0.75f);
-		tileRenderer.material.SetFloat("_Glossiness",0.25f);
 	}
 
 	private float[,] GenerateHeightMap(float offsetX, float offsetZ) {
@@ -216,7 +214,7 @@ public class TileGeneration : MonoBehaviour
 		meshCollider.sharedMesh = mesh;
 	}
 	
-	 private void ParityScatter(GameObject prefab, float[,] matrix, float value) {
+	 private void ParityScatter(Prefab prefab, float[,] matrix, float value) {
 		 if (value > 100)
 		 {
 			 // Ex. input is 175 = 25% chance of spawn per tile
@@ -252,14 +250,14 @@ public class TileGeneration : MonoBehaviour
 				}
 				
 			    // Max is now the biggest number in our radius. If its equal to our value, we are the biggest. Instantiate.
-			    if(Mathf.Approximately(max, matrix[i, j])){
+			    if(Mathf.Approximately(max, matrix[i, j])){ 
 				    InstantiateAtTilePosition(prefab, i, j);
 			    }
 			}
 		}
 	 }
 
-	 private void NonParityScatter(GameObject prefab, float density)
+	 private void NonParityScatter(Prefab prefab, float density)
 	 {
 		 int n; // decimal density decider (for values less than 1/tile)
 		 if (density < 1f)
@@ -291,21 +289,44 @@ public class TileGeneration : MonoBehaviour
 		 }
 	 }
 
-	 private void InstantiateAtTilePosition(GameObject prefab, float x, float y)
+	 private void InstantiateAtTilePosition(Prefab prefab, float x, float y)
 	 {
 		 Vector3 pos = transform.position;
 		 Vector3 prefabPos = new(pos.x + x - tileWidth/2f + 0.5f, pos.y + 10, pos.z + y - tileDepth/2f + 0.5f);
 		 Ray ray = new(prefabPos, Vector3.down);
 		 if (Physics.Raycast(ray, out var hit, 15f))
 		 {
-			 if (!hit.collider.gameObject.CompareTag("Floor"))
-			 {
-				 return;
-			 }
-			 prefabPos = hit.point;
-			 
-			 Instantiate(prefab, prefabPos, Quaternion.LookRotation(hit.normal)).transform.Rotate(90,0,0);;
 			 //Debug.DrawRay(prefabPos, hit.normal * 4, Color.red, 55f);
+			 if (hit.collider.gameObject.CompareTag("Floor"))
+			 {
+				 // Place our object, rotate it to face correctly, and then scale it according to a bell curve
+				 GameObject placedPrefab = Instantiate(prefab.prefab, hit.point, Quaternion.LookRotation(hit.normal));
+				 placedPrefab.transform.Rotate(0, 0, Random.Range(0f,360f), Space.Self);
+				 placedPrefab.transform.Rotate(90, 0, 0, Space.Self);
+
+				 if (prefab.useScaleCurve)
+				 {
+					 float scaleFactor = 1;
+					 switch (prefab.prefab.tag)
+					 {
+						 case "Stump":
+							 scaleFactor = 3f;
+							 break;
+						 case "ColorShroom":
+							 scaleFactor = 17f;
+							 placedPrefab.transform.Translate(0,-1,0,Space.Self);
+							 break;
+						 case "BigShroom":
+							 scaleFactor = 8f;
+							 placedPrefab.transform.Translate(0,-1,0,Space.Self);
+							 break;
+						 case "Bush":
+							 scaleFactor = 4f;
+							 break;
+					 }
+					 placedPrefab.transform.localScale = Vector3.one * scaleFactor * (prefab.scale.Evaluate(Random.Range(0f, 1f)) + 0.5f);
+				 }
+			  }
 		 }
 	 }
 }

@@ -11,7 +11,7 @@ public class LevelGeneration : MonoBehaviour
     public int mapDepthInTiles;
 
     [Header("Prefab List")] 
-    public GameObject[] prefabs;
+    public Prefab[] prefabs;
         
     [Header("Texture Properties")]
     public GameObject tilePrefab;
@@ -77,4 +77,11 @@ public class LevelGeneration : MonoBehaviour
         }
         Instantiate(prefab, prefabPos, Quaternion.identity);
     }
+}
+
+[Serializable]
+public class Prefab {
+    public GameObject prefab;
+    public bool useScaleCurve;
+    public AnimationCurve scale;
 }
