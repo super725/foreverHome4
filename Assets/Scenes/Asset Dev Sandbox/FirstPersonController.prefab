@@ -79,10 +79,20 @@ MonoBehaviour:
   canUseHeadbob: 1
   willSlideOnSlopes: 1
   canZoom: 1
+  useStamina: 1
   sprintKey: 304
   jumpKey: 32
   crouchKey: 306
   zoomKey: 324
+  maxHealth: 100
+  timeBeforeRegenStarts: 3
+  healthValueIncrement: 1
+  healthTimeIncrement: 0.1
+  maxStamina: 100
+  staminaUseMultiplier: 5
+  timeBeforeStaminaRegen: 5
+  staminaValueIncrement: 2
+  staminaTimeIncrement: 0.1
   walkSpeed: 3
   sprintSpeed: 6
   crouchSpeed: 1.5

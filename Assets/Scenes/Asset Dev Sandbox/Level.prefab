@@ -44,8 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02945019a34aed24f81684ef37f847c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapWidthInTiles: 8
-  mapDepthInTiles: 8
+  rawMapWidth: 4
+  rawMapDepth: 4
+  borderThickness: 5
   prefabs:
   - prefab: {fileID: 7635200367818325309, guid: 528948f82bd631f469d810eeaa5f0363, type: 3}
     useScaleCurve: 0
@@ -1158,6 +1159,8 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   tilePrefab: {fileID: 7599130829288090861, guid: a544656acd4e44844a387a94b9dd7f4b, type: 3}
+  flatPrefab: {fileID: 7599130829288090861, guid: 326438eff2e420c4aa5fd823f549ff2d, type: 3}
+  borderPrefab: {fileID: 7599130829288090861, guid: 5f8c3ff4ec836414d80a7a7f164cf71c, type: 3}
   tileResolution: 128
   texture1: {fileID: 2800000, guid: e3fd5ddc356605a4e80dc3d802e993a4, type: 3}
   texture2: {fileID: 2800000, guid: 1d6eb39dd37b8ee41ab5b6970b9ca418, type: 3}
