@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2357956}
   m_Layer: 0
   m_Name: CapConvex_StalkBolbous_LOD0_Type01
-  m_TagString: Untagged
+  m_TagString: ColorShroom
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
