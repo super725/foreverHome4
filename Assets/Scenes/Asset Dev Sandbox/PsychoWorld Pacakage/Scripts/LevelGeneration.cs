@@ -10,15 +10,17 @@ public class LevelGeneration : MonoBehaviour
     public int rawMapWidth;
     public int rawMapDepth;
     public int borderThickness;
-    
+    public GameObject tilePrefab;
+    public GameObject flatPrefab;
+    public GameObject borderPrefab;
+    public GameObject waterPrefab;
+    public GameObject waterSpecularPrefab;
+    public int waterHeight;
     
     [Header("Prefab List")] 
     public Prefab[] prefabs;
         
     [Header("Texture Properties")]
-    public GameObject tilePrefab;
-    public GameObject flatPrefab;
-    public GameObject borderPrefab;
     public int tileResolution;
     public Texture2D texture1, texture2;
     public AnimationCurve blendCurve;
@@ -97,8 +99,13 @@ public class LevelGeneration : MonoBehaviour
         
         yield return 0; // Raycast collision doesnt work until after the mesh generation frame
         
-        Vector2 centerPos = new(mapWidth * tileWidth / 2f, mapDepth * tileDepth / 2f);
+        Vector2 centerPos = new(mapWidth * tileWidth / 2f - (tileWidth / 2f) , mapDepth * tileDepth / 2f - (tileDepth / 2f));
         InstantiateObjectInMap(playerPrefab, centerPos.x, centerPos.y);
+        
+        yield return 0;
+        Instantiate(waterPrefab, new Vector3(centerPos.x, waterHeight, centerPos.y), Quaternion.identity).transform.localScale = new Vector3(mapWidth, 1, mapDepth);
+        Instantiate(waterSpecularPrefab, new Vector3(centerPos.x, waterHeight, centerPos.y), Quaternion.identity).transform.localScale = new Vector3(mapWidth, 1, mapDepth);
+        
     }
     
     private void InstantiateObjectInMap(GameObject prefab, float x, float y)
