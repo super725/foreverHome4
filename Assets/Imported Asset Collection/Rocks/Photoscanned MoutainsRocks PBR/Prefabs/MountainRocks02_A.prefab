@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4331374801683996}
   - component: {fileID: 205447241113997142}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MountainRocks02_A
   m_TagString: Rock
   m_Icon: {fileID: 0}
@@ -74,7 +74,7 @@ GameObject:
   - component: {fileID: 4083046962106994}
   - component: {fileID: 33650767577635408}
   - component: {fileID: 23686539128610344}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MoutainsRocks02_A_LOD2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -157,7 +157,7 @@ GameObject:
   - component: {fileID: 4117721236712126}
   - component: {fileID: 33106227806587486}
   - component: {fileID: 23546992305080452}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MoutainsRocks02_A_LOD0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -240,7 +240,7 @@ GameObject:
   - component: {fileID: 4030587858310826}
   - component: {fileID: 33804678352036958}
   - component: {fileID: 23848119125214378}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MoutainsRocks02_A_LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -322,7 +322,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4601405747347760}
   - component: {fileID: 64282036212903350}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

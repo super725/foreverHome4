@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 
@@ -66,11 +67,6 @@ public class TileGeneration : MonoBehaviour
 		
 		yield return 0;
 		
-		// Get or add the NavMeshSurface component to the game object
-		BuildNavMesh(gameObject);
-
-		yield return 0;
-		
 		// build a Texture2D from the height map
 		Texture2D tileTexture = BuildTexture (heightMap);
 		tileRenderer.material.mainTexture = tileTexture;
@@ -90,6 +86,11 @@ public class TileGeneration : MonoBehaviour
 			float[,] generativeMap = GenerateScatterMap(offsetX+i, offsetZ+i);
 			ParityScatter(prefabs[i], generativeMap, scatterRadius);
 		}
+		
+		yield return 0;
+
+		// Get or add the NavMeshSurface component to the game object
+		BuildNavMesh(gameObject);
 	}
 
 	private float[,] GenerateHeightMap(float offsetX, float offsetZ) {
@@ -332,7 +333,7 @@ public class TileGeneration : MonoBehaviour
 						 case "Tree" :
 							 break;
 						 case "Rock" :
-							 BuildNavMesh(placedPrefab);
+							 //BuildNavMesh(placedPrefab);
 							 break;
 					 }
 					 placedPrefab.transform.localScale = Vector3.one * scaleFactor * (prefab.scale.Evaluate(Random.Range(0f, 1f)) + 0.5f);
@@ -345,12 +346,9 @@ public class TileGeneration : MonoBehaviour
 	 {
 		 // Get or add the NavMeshSurface component to the game object
 		 NavMeshSurface navMeshSurface = o.GetComponent<NavMeshSurface>();
-		 if (navMeshSurface == null)
+		 if (navMeshSurface != null)
 		 {
-			 navMeshSurface = o.AddComponent<NavMeshSurface>();
+			 navMeshSurface.BuildNavMesh();
 		 }
-
-		 // Generate the NavMesh
-		 navMeshSurface.BuildNavMesh();
 	 }
 }

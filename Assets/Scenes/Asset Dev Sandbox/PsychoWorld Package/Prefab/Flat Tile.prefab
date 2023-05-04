@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8829549807075289011}
   - component: {fileID: 7800136852556963437}
   - component: {fileID: 485585297804050287}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Flat Tile
   m_TagString: Floor
   m_Icon: {fileID: 0}
@@ -150,12 +150,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AgentTypeID: 0
-  m_CollectObjects: 0
+  m_CollectObjects: 1
   m_Size: {x: 10, y: 10, z: 10}
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_UseGeometry: 0
   m_DefaultArea: 0
   m_GenerateLinks: 0

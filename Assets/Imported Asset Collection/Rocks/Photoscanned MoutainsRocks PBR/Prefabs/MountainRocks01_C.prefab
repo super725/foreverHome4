@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 33167606287145104}
   - component: {fileID: 23608503925538808}
   - component: {fileID: 64583442126554722}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MountainRocks01_C
   m_TagString: Rock
   m_Icon: {fileID: 0}
