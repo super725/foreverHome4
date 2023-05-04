@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 using UnityEngine;
 
 public class FlatGeneration : MonoBehaviour
@@ -58,6 +59,11 @@ public class FlatGeneration : MonoBehaviour
 		// Use Perlin Noise to generate a height map
 		float[,] heightMap = GenerateHeightMap(offsetX, offsetZ);
 		
+		yield return 0;
+		
+		// Get or add the NavMeshSurface component to the game object
+		BuildNavMesh(gameObject);
+
 		yield return 0;
 		
 		//build a Texture2D from the height map
@@ -157,5 +163,17 @@ public class FlatGeneration : MonoBehaviour
 		}
 
 		return outputArray;
+	}
+	private void BuildNavMesh(GameObject o)
+	{
+		// Get or add the NavMeshSurface component to the game object
+		NavMeshSurface navMeshSurface = o.GetComponent<NavMeshSurface>();
+		if (navMeshSurface == null)
+		{
+			navMeshSurface = o.AddComponent<NavMeshSurface>();
+		}
+
+		// Generate the NavMesh
+		navMeshSurface.BuildNavMesh();
 	}
 }

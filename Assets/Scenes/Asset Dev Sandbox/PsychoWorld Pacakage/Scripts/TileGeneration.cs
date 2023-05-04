@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.AI.Navigation;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -63,6 +64,11 @@ public class TileGeneration : MonoBehaviour
 		float[,] heightMap = GenerateHeightMap(offsetX, offsetZ);
 		UpdateMeshVertices(heightMap); // Use new heightmap as our vertices' y values.
 		
+		yield return 0;
+		
+		// Get or add the NavMeshSurface component to the game object
+		BuildNavMesh(gameObject);
+
 		yield return 0;
 		
 		// build a Texture2D from the height map
@@ -323,10 +329,28 @@ public class TileGeneration : MonoBehaviour
 						 case "Bush":
 							 scaleFactor = 4f;
 							 break;
+						 case "Tree" :
+							 break;
+						 case "Rock" :
+							 BuildNavMesh(placedPrefab);
+							 break;
 					 }
 					 placedPrefab.transform.localScale = Vector3.one * scaleFactor * (prefab.scale.Evaluate(Random.Range(0f, 1f)) + 0.5f);
 				 }
 			  }
 		 }
+	 }
+
+	 private void BuildNavMesh(GameObject o)
+	 {
+		 // Get or add the NavMeshSurface component to the game object
+		 NavMeshSurface navMeshSurface = o.GetComponent<NavMeshSurface>();
+		 if (navMeshSurface == null)
+		 {
+			 navMeshSurface = o.AddComponent<NavMeshSurface>();
+		 }
+
+		 // Generate the NavMesh
+		 navMeshSurface.BuildNavMesh();
 	 }
 }

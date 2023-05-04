@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4265569730808766650}
   - component: {fileID: 8829549807075289011}
   - component: {fileID: 4720734993871044867}
+  - component: {fileID: -3173378549891945208}
   m_Layer: 0
   m_Name: Border Tile
   m_TagString: Floor
@@ -136,3 +137,34 @@ MonoBehaviour:
   tileRenderer: {fileID: 348058875314249110}
   meshFilter: {fileID: 9059919637609753902}
   meshCollider: {fileID: 4265569730808766650}
+--- !u!114 &-3173378549891945208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7599130829288090861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 0}
+  m_BuildHeightMesh: 0

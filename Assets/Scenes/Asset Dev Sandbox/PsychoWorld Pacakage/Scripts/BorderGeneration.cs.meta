@@ -3,7 +3,11 @@ guid: ba64ed47a94ad3d4d861908f8f4be4df
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - noiseMapGeneration: {fileID: 8829549807075289011, guid: 5f8c3ff4ec836414d80a7a7f164cf71c, type: 3}
+  - tileRenderer: {fileID: 348058875314249110, guid: 5f8c3ff4ec836414d80a7a7f164cf71c, type: 3}
+  - meshFilter: {fileID: 9059919637609753902, guid: 5f8c3ff4ec836414d80a7a7f164cf71c, type: 3}
+  - meshCollider: {fileID: 4265569730808766650, guid: 5f8c3ff4ec836414d80a7a7f164cf71c, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
