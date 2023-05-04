@@ -1,27 +1,33 @@
 using UnityEngine;
 using System.Collections;
+using TMPro;
 
 public class ShotgunDmg : MonoBehaviour
 {
-    public Transform bulletSpawnPoint; // Reference to the bullet spawn point.
-    public GameObject bulletPrefab; // Reference to the bullet prefab.
+    public Transform bulletSpawnPoint;
+    public GameObject bulletPrefab;
     public float damage = 10f;
     public float range = 100f;
     public ParticleSystem muzzleFlash;
     public int maxAmmo = 30;
     public float reloadTime = 2f;
-    public float shootCooldown = 0.5f; // Cooldown period between shots.
+    public float shootCooldown = 0.5f;
 
     [HideInInspector]
     public int currentAmmo;
 
     private Transform cameraTransform;
-    private bool canShoot = true; // Flag to track if shooting is allowed.
+    private bool canShoot = true;
+    private bool isReloading = false;
+
+    public TextMeshProUGUI ammoText; // Reference to the ammo text UI element.
 
     void Start()
     {
         cameraTransform = Camera.main.transform;
         currentAmmo = maxAmmo;
+
+        UpdateAmmoText(); // Update the ammo text at the start.
     }
 
     void Update()
@@ -30,17 +36,27 @@ public class ShotgunDmg : MonoBehaviour
         {
             Shoot();
         }
+
+        if (Input.GetKeyDown(KeyCode.R) && canShoot && currentAmmo < maxAmmo)
+        {
+            StartCoroutine(Reload());
+        }
     }
 
     public void Shoot()
     {
-        if (currentAmmo <= 0)
+        if (!canShoot || isReloading)
         {
-            Debug.Log("Out of ammo!");
             return;
         }
 
-        // Trigger the muzzle flash particle system.
+        if (currentAmmo <= 0)
+        {
+            Debug.Log("Out of ammo!");
+            canShoot = false;
+            return;
+        }
+
         if (muzzleFlash != null && !muzzleFlash.isPlaying)
         {
             muzzleFlash.Play();
@@ -48,21 +64,17 @@ public class ShotgunDmg : MonoBehaviour
 
         currentAmmo--;
 
-        // Spawn the bullet prefab at the bullet spawn point position and rotation.
         GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
         Rigidbody bulletRigidbody = bullet.GetComponent<Rigidbody>();
 
-        // Set the bullet's velocity to move straight in the shooting direction.
         if (bulletRigidbody != null)
         {
             bulletRigidbody.velocity = bulletSpawnPoint.forward * range;
         }
 
-        // Cast a ray from the bullet spawn point in the direction of its forward vector.
         Ray ray = new Ray(bulletSpawnPoint.position, bulletSpawnPoint.forward);
         if (Physics.Raycast(ray, out RaycastHit hit, range))
         {
-            // Apply damage to the hit object if it has a collider.
             if (hit.collider != null)
             {
                 Enemy enemy = hit.collider.gameObject.GetComponent<Enemy>();
@@ -73,15 +85,55 @@ public class ShotgunDmg : MonoBehaviour
             }
         }
 
-        canShoot = false; // Disable shooting temporarily.
-        StartCoroutine(EnableShootingAfterCooldown()); // Enable shooting after the cooldown period.
+        canShoot = false;
+        StartCoroutine(EnableShootingAfterCooldown());
 
-        Destroy(bullet, 0.5f); // Destroy the bullet after half a second
+        Destroy(bullet, 0.5f);
+
+        UpdateAmmoText(); // Update the ammo text after shooting.
     }
 
     IEnumerator EnableShootingAfterCooldown()
     {
-        yield return new WaitForSeconds(shootCooldown); // Wait for the cooldown period.
-        canShoot = true; // Enable shooting.
+        yield return new WaitForSeconds(shootCooldown);
+        canShoot = true;
+
+        if (currentAmmo <= 0)
+        {
+            StartCoroutine(Reload());
+        }
+    }
+
+    IEnumerator Reload()
+    {
+        isReloading = true;
+
+        yield return new WaitForSeconds(reloadTime);
+        int ammoNeeded = maxAmmo - currentAmmo;
+        int ammoToReload = Mathf.Min(ammoNeeded, currentAmmo);
+        currentAmmo -= ammoToReload;
+
+        yield return new WaitForSeconds(reloadTime);
+        currentAmmo += ammoToReload;
+        isReloading = false;
+
+        UpdateAmmoText(); // Update the ammo text after reloading.
+    }
+
+    void UpdateAmmoText()
+    {
+        if (ammoText != null)
+        {
+            ammoText.text = "Ammo: " + currentAmmo.ToString() + "/" + maxAmmo.ToString();
+
+            if (currentAmmo <= 0)
+            {
+                ammoText.color = Color.red; // Turn the text red when out of ammo.
+            }
+            else
+            {
+                ammoText.color = Color.white; // Reset the text color to white.
+            }
+        }
     }
 }
