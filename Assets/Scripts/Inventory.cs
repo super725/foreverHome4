@@ -5,51 +5,52 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
-   private const int SLOTS = 6;
+    #region Singleton
+    
+    
+    public static Inventory instance;
 
-   private List<IInventoryItem> mItems = new List<IInventoryItem>();
+    private void Awake()
+    {
+        if (instance != null)
+        {
+            Debug.LogWarning("More than one instance of inventory Found!");
+        }
+        instance = this;
+    }
+    #endregion
 
-   public event EventHandler<InventoryEventArgs> ItemAdded;
+    public delegate void OnItemChanged();
 
-   public event EventHandler<InventoryEventArgs> ItemRemoved; 
+    public OnItemChanged onItemChangedCallback;
+    
+    public int space = 20;
+    
+    public List<Item> items = new List<Item>();
 
-   public void AddItem(IInventoryItem item)
-   {
-      if (mItems.Count < SLOTS)
-      {
-         Collider collider = (item as MonoBehaviour).GetComponent<Collider>();
-         if (collider.enabled)
-         {
-            collider.enabled = false;
-            
-            mItems.Add(item);
-            
-            item.OnPickup();
-
-            if (ItemAdded != null)
+    public bool Add(Item item)
+    {
+        if (!item.isDefaultItem)
+        {
+            if (items.Count >= space)
             {
-               ItemAdded(this, new InventoryEventArgs(item));
+                Debug.Log("Not enough Room");
+                return false;
             }
-         }
-      }
-   }
+            items.Add(item);
+            
+            if(onItemChangedCallback != null)
+                onItemChangedCallback.Invoke();
+        }
 
-   public void RemoveItem(IInventoryItem item)
-   {
-      mItems.Remove(item);
-       item.OnDrop();
+        return true;
+    }
 
-       Collider collider = (item as MonoBehaviour).GetComponent<Collider>();
-       if (collider != null)
-       {
-          collider.enabled = true;
-       }
-
-       if (ItemRemoved != null)
-       {
-          ItemRemoved(this, new InventoryEventArgs(item));
-       }
-   }
-
-
+    public void Remove(Item item)
+    {
+        items.Remove(item);
+        
+        if(onItemChangedCallback != null)
+            onItemChangedCallback.Invoke();
+    }
 }

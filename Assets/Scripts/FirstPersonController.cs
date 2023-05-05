@@ -54,8 +54,10 @@ public class FirstPersonController : MonoBehaviour
 
 
     [Header("Inventory Parameters")]
-     public Inventory inventory;
+     
 
+     public GameObject Hand;
+     
 
     [Header("Movement Parameters")] 
     [SerializeField]private float walkSpeed = 3.0f;
@@ -105,6 +107,8 @@ public class FirstPersonController : MonoBehaviour
     //Sliding Parameters
     private Vector3 hitPointNormal;
 
+     
+
     private bool isSliding
     {
         get
@@ -126,15 +130,16 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private Vector3 interactionRayPoint = default;
     [SerializeField] private float interactionDistance = default;
     [SerializeField] private LayerMask interactionLayer = default;
-    private Interaction currentInteractable;
     
     
-    private Camera playerCamera;
+    
+    Camera playerCamera;
     private CharacterController characterController;
     private Vector3 moveDirection;
     private Vector2 currentInput;
 
     private float rotationX = 0;
+    public Interactable focus;
 
     private void OnEnable()
     {
@@ -146,11 +151,15 @@ public class FirstPersonController : MonoBehaviour
         OnTakeDamage -= ApplyDamage;
     }
 
-    private void Start()
+    void Start()
     {
         characterController = GetComponent<CharacterController>();
         originalHeight = characterController.height;
+        playerCamera = Camera.main;
+
     }
+
+    
 
     void Awake()
     {
@@ -187,20 +196,45 @@ public class FirstPersonController : MonoBehaviour
             if (useStamina)
                 HandleStamina();
 
-            if (canInteract)
-            {
-                HandleInteractionCheck();
-                HandleInteractionInput();
-            }
-
             if (Input.GetKeyDown(KeyCode.I))
             {
                 ToggleCursorLock();
             }
 
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit, 100))
+                {
+                  Interactable interactable = hit.collider.GetComponent<Interactable>();
+                  if (interactable != null)
+                  {
+                      SetFocus(interactable);
+                  }
+                }
+            }
+
             ApplyFinalMovements();
         }   
     }
+
+    void SetFocus(Interactable newFocus)
+    {
+        if (newFocus != focus)
+        {
+            if(focus != null)
+                focus.onDefocused();
+            
+            focus = newFocus;
+        }
+        newFocus.OnFocused(transform);
+    }
+
+    
+    
+    
 
     private void HandleMovementInput()
     {
@@ -341,33 +375,24 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
-    private void HandleInteractionCheck()
-    {
-        if (Physics.Raycast(playerCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit,
-                interactionDistance))
-        {
-            if (hit.collider.gameObject.layer == 6 && (currentInteractable == null || hit.collider.gameObject.GetInstanceID() != currentInteractable.GetInstanceID()))
-            {
-                hit.collider.TryGetComponent(out currentInteractable);
-                if(currentInteractable)
-                    currentInteractable.OnFocus();
-            }
-        }else if (currentInteractable)
-        {
-            currentInteractable.OnLoseFocus();
-            currentInteractable = null;
-        }
-    }
-
-    private void HandleInteractionInput()
-    {
-        if (Input.GetKeyDown(interactKey) && currentInteractable != null && Physics.Raycast(
-                playerCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance,
-                interactionLayer))
-        {
-            currentInteractable.OnInteract();
-        }
-    }
+    // private void HandleInteractionCheck()
+    // {
+    //     if (Physics.Raycast(playerCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit,
+    //             interactionDistance))
+    //     {
+    //         if (hit.collider.gameObject.layer == 6 && (currentInteractable == null || hit.collider.gameObject.GetInstanceID() != currentInteractable.GetInstanceID()))
+    //         {
+    //             hit.collider.TryGetComponent(out currentInteractable);
+    //             if(currentInteractable)
+    //                 currentInteractable.OnFocus();
+    //         }
+    //     }else if (currentInteractable)
+    //     {
+    //         currentInteractable.OnLoseFocus();
+    //         currentInteractable = null;
+    //     }
+    // }
+    
     
     
     private void ApplyFinalMovements()
@@ -473,12 +498,5 @@ public class FirstPersonController : MonoBehaviour
         regenerateStamina = null;
     }
 
-    private void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        IInventoryItem item = hit.collider.GetComponent<IInventoryItem>();
-        if (item != null)
-        {
-            inventory.AddItem(item);
-        }
-    }
+    
 }
