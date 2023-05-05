@@ -9,10 +9,15 @@ public class EnemyMovement : MonoBehaviour
 
     void Start()
     {
+        LevelGeneration.OnReady += OnMapReady;
         agent = GetComponent<NavMeshAgent>();
+        
+    }
+    private void OnMapReady()
+    {
         target = GameObject.Find(targetName).transform;
     }
-
+    
     void Update()
     {
         if (agent != null && target != null)

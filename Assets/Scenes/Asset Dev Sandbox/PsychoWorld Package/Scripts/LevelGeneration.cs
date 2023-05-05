@@ -18,8 +18,9 @@ public class LevelGeneration : MonoBehaviour
     public int waterHeight;
     
     [Header("Prefab List")] 
-    public Prefab[] prefabs;
-        
+    public Prefab[] staticPrefabs;
+    public Prefab[] dynamicPrefabs;
+    
     [Header("Texture Properties")]
     public int tileResolution;
     public Texture2D texture1, texture2;
@@ -37,7 +38,8 @@ public class LevelGeneration : MonoBehaviour
     
     [Header("Miscellaneous")]
     public GameObject playerPrefab;
-
+    public static event Action OnReady;
+    
     private Transform myTransform;
     private Vector3 myPosition;
     
@@ -62,6 +64,7 @@ public class LevelGeneration : MonoBehaviour
     }
 
     IEnumerator GenerateMap() {
+
         // for each Tile, instantiate a Tile in the correct position
         for (int xTileIndex = 0; xTileIndex < mapWidth; xTileIndex++) {
             for (int zTileIndex = 0; zTileIndex < mapDepth; zTileIndex++) {
@@ -99,13 +102,16 @@ public class LevelGeneration : MonoBehaviour
         
         yield return 0; // Raycast collision doesnt work until after the mesh generation frame
         
+        // Instantiate Player object and water planes
         Vector2 centerPos = new(mapWidth * tileWidth / 2f - (tileWidth / 2f) , mapDepth * tileDepth / 2f - (tileDepth / 2f));
         InstantiateObjectInMap(playerPrefab, centerPos.x, centerPos.y);
-        
-        yield return 0;
         Instantiate(waterPrefab, new Vector3(centerPos.x, waterHeight, centerPos.y), Quaternion.identity).transform.localScale = new Vector3(mapWidth, 1, mapDepth);
         Instantiate(waterSpecularPrefab, new Vector3(centerPos.x, waterHeight, centerPos.y), Quaternion.identity).transform.localScale = new Vector3(mapWidth, 1, mapDepth);
-        
+
+        yield return new WaitForSeconds(1);
+        // Broadcast ready state to initialize all the enemies' scripts
+        Debug.Log("Invoking Ready State");
+        OnReady?.Invoke();
     }
     
     private void InstantiateObjectInMap(GameObject prefab, float x, float y)
