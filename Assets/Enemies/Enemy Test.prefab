@@ -5401,6 +5401,7 @@ MonoBehaviour:
   health: 100
   panickNum: 20
   target: {fileID: 0}
+  state: 
 --- !u!114 &7108253999311876235
 MonoBehaviour:
   m_ObjectHideFlags: 0
