@@ -5,7 +5,10 @@ using UnityEngine;
 
 public class LevelGeneration : MonoBehaviour
 {
-
+    [Header("Level Type")] 
+    public bool isHome;
+    public GameObject cabinPrefab;
+    
     [Header("Level Properties")] 
     public int rawMapWidth;
     public int rawMapDepth;
@@ -13,13 +16,16 @@ public class LevelGeneration : MonoBehaviour
     public GameObject tilePrefab;
     public GameObject flatPrefab;
     public GameObject borderPrefab;
+    public GameObject centerPrefab;
     public GameObject waterPrefab;
     public GameObject waterSpecularPrefab;
     public int waterHeight;
     
     [Header("Prefab List")] 
     public Prefab[] staticPrefabs;
+    public Prefab[] psychoPrefabs;
     public Prefab[] dynamicPrefabs;
+    
     
     [Header("Texture Properties")]
     public int tileResolution;
@@ -83,18 +89,23 @@ public class LevelGeneration : MonoBehaviour
                    || (zTileIndex >= 0 && zTileIndex < borderThickness-1 || zTileIndex > mapDepth-borderThickness && zTileIndex <= mapDepth)
                    )
                 {
-                    // Flat
+                    // Flat (completely flat)
                     Instantiate (flatPrefab, tilePosition, Quaternion.identity, myTransform);
                 }
                 // 2 and 4
                 else if((xTileIndex == borderThickness-1 || xTileIndex == mapWidth-borderThickness )
                         || (zTileIndex == borderThickness-1 || zTileIndex == mapDepth-borderThickness))
                 {
-                    // Border
+                    // Border (Interpolated height)
                     Instantiate (borderPrefab, tilePosition, Quaternion.identity, myTransform);
+                }else if (xTileIndex == mapWidth/2 && zTileIndex == mapDepth/2)
+                {
+                    // Center Tile OR Level Tile, depending on whether we are in Psycho or Normal
+                    Instantiate(isHome ? centerPrefab : tilePrefab, tilePosition, Quaternion.identity, myTransform);
                 }
                 else
                 {
+                    // Level (noisemap Assets)
                     Instantiate (tilePrefab, tilePosition, Quaternion.identity, myTransform);
                 }
             }

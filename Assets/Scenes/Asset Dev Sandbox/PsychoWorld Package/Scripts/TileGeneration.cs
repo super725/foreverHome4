@@ -22,8 +22,10 @@ public class TileGeneration : MonoBehaviour
 	
 	public NoiseMapGeneration noiseMapGeneration;
 
+	private bool isHome;
 	private Prefab[] staticPrefabs;
 	private Prefab[] dynamicPrefabs;
+	private Prefab[] psychoPrefabs;
 
 	//public GameObject treePrefab, spherePrefab;
 	
@@ -31,7 +33,7 @@ public class TileGeneration : MonoBehaviour
 	[SerializeField] private MeshFilter meshFilter;
 	[SerializeField] private MeshCollider meshCollider;
 
-	private float tileWidth, tileDepth, scatterDensity, scatterRadius;
+	private float mapWidth, mapDepth, tileWidth, tileDepth, scatterDensity, scatterRadius;
 	private static readonly int Metallic = Shader.PropertyToID("_Metallic");
 	private static readonly int Glossiness = Shader.PropertyToID("_Glossiness");
 
@@ -51,10 +53,16 @@ public class TileGeneration : MonoBehaviour
 		scatterDensity = args.scatterDensity;
 		staticPrefabs = args.staticPrefabs;
 		dynamicPrefabs = args.dynamicPrefabs;
+		psychoPrefabs = args.psychoPrefabs;
+		isHome = args.isHome;
 
 		Vector3 tileSize = GetComponent<MeshRenderer>().bounds.size;
 		tileWidth = (int)tileSize.x;
 		tileDepth = (int)tileSize.z;
+
+		mapWidth = args.mapWidth;
+		mapDepth = args.mapDepth;
+		
 		StartCoroutine(nameof(GenerateTile));
 	}
 
@@ -75,6 +83,17 @@ public class TileGeneration : MonoBehaviour
 		{
 			NonParityScatter(staticPrefabs[i], scatterDensity);
 		}
+		
+		// Place the shroomy stuff if in psycho
+		if (!isHome)
+		{
+			for (int i = 0; i < psychoPrefabs.Length; i++)
+			{
+				NonParityScatter(psychoPrefabs[i], scatterDensity);
+			}
+		}
+
+		
 		yield return 0;
 		
 		// Do this after Static prefab loading, but before dynamic prefab loading
@@ -309,6 +328,11 @@ public class TileGeneration : MonoBehaviour
 			 // unless prefab is an enemy, prefabs must spawn atop empty ground
 			 if (hit.collider.gameObject.CompareTag("Floor") || prefab.prefab.CompareTag("Enemy"))
 			 {
+				 if (prefab.prefab.CompareTag("Rock") && Vector3.Distance(hit.point, new Vector3(mapWidth/2*tileWidth, 0.5f, mapDepth/2*mapDepth)) < 15f)
+				 {
+					 return; // Reduce chance of rocks clipping cabin prefab (band aid)
+				 }
+				 
 				 // Place our object, rotate it to face correctly, and then scale it according to a bell curve
 				 GameObject placedPrefab = Instantiate(prefab.prefab, hit.point, Quaternion.LookRotation(hit.normal), transform);
 				 placedPrefab.transform.Rotate(0, 0, Random.Range(0f,360f), Space.Self);

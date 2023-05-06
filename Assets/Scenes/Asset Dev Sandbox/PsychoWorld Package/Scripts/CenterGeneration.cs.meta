@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 713bccbe2e0f6ff4495d0ec341418fc2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - noiseMapGeneration: {fileID: 8829549807075289011, guid: 326438eff2e420c4aa5fd823f549ff2d, type: 3}
+  - tileRenderer: {fileID: 348058875314249110, guid: 326438eff2e420c4aa5fd823f549ff2d, type: 3}
+  - meshFilter: {fileID: 9059919637609753902, guid: 326438eff2e420c4aa5fd823f549ff2d, type: 3}
+  - meshCollider: {fileID: 4265569730808766650, guid: 326438eff2e420c4aa5fd823f549ff2d, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
