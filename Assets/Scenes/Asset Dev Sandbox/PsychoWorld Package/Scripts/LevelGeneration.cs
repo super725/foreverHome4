@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class LevelGeneration : MonoBehaviour
 {
@@ -51,8 +52,28 @@ public class LevelGeneration : MonoBehaviour
     
     [NonSerialized] public int tileWidth, tileDepth;
     [NonSerialized] public int mapWidth, mapDepth;
+
+
     void Start()
     {
+        BuildMap(false);
+    }
+
+    void BuildMap(bool home)
+    {
+        // Parameters up for change:
+        isHome = home;
+        
+        // Else randomly generated
+        heightWave = new Wave[3];
+        for (int i = 0; i < 3; i++)
+        {
+            heightWave[i] = new Wave(Random.Range(1f, 9999f), Random.Range(0.01f, 1.0f),  Random.Range(0.01f, 1.0f));
+        }
+        
+        rawMapWidth = Random.Range(2, 7);
+        rawMapDepth = Random.Range(2, 7);
+        
         if (borderThickness < 2)
         {
             borderThickness = 2;
@@ -143,4 +164,18 @@ public class Prefab {
     public GameObject prefab;
     public bool useScaleCurve;
     public AnimationCurve scale;
+}
+
+[Serializable]
+public class Wave {
+    public float seed ;
+    public float frequency;
+    public float amplitude;
+
+    public Wave(float sd, float freq, float amp)
+    {
+        seed = sd;
+        frequency = freq; 
+        amplitude = amp;
+    }
 }

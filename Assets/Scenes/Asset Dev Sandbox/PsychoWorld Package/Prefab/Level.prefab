@@ -44,11 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02945019a34aed24f81684ef37f847c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isHome: 1
+  isHome: 0
   cabinPrefab: {fileID: 4845670220023421377, guid: 281e9271b99aa4f4898b24d9aa88ed4e, type: 3}
-  rawMapWidth: 4
-  rawMapDepth: 3
-  borderThickness: 2
+  rawMapWidth: 0
+  rawMapDepth: 0
+  borderThickness: 0
   tilePrefab: {fileID: 7599130829288090861, guid: a544656acd4e44844a387a94b9dd7f4b, type: 3}
   flatPrefab: {fileID: 7599130829288090861, guid: 326438eff2e420c4aa5fd823f549ff2d, type: 3}
   borderPrefab: {fileID: 7599130829288090861, guid: 5f8c3ff4ec836414d80a7a7f164cf71c, type: 3}
@@ -107,17 +107,17 @@ MonoBehaviour:
         inWeight: 0
         outWeight: 0.15272728
       - serializedVersion: 3
-        time: 0.5
-        value: 1
-        inSlope: 0
-        outSlope: 0
+        time: 0.4502984
+        value: 0.90801966
+        inSlope: -2.7790806
+        outSlope: -2.7790806
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
-        outWeight: 0
+        outWeight: 0.032565013
       - serializedVersion: 3
-        time: 1
-        value: 0
+        time: 0.77941895
+        value: 0.0023498535
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -654,13 +654,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  heightWave:
-  - seed: 3213
-    frequency: 0.75
-    amplitude: 2
-  - seed: 1232
-    frequency: 0.25
-    amplitude: 1
+  heightWave: []
   scatterWave:
   - seed: 2452
     frequency: 3

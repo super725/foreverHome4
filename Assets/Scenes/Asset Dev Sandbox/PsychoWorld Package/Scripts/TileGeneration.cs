@@ -328,7 +328,7 @@ public class TileGeneration : MonoBehaviour
 			 // unless prefab is an enemy, prefabs must spawn atop empty ground
 			 if (hit.collider.gameObject.CompareTag("Floor") || prefab.prefab.CompareTag("Enemy"))
 			 {
-				 if (prefab.prefab.CompareTag("Rock") && Vector3.Distance(hit.point, new Vector3(mapWidth/2*tileWidth, 0.5f, mapDepth/2*mapDepth)) < 15f)
+				 if (prefab.prefab.CompareTag("Rock") && Vector3.Distance(hit.point, new Vector3(mapWidth/2*tileWidth, 0.5f, mapDepth/2*mapDepth)) < 20f)
 				 {
 					 return; // Reduce chance of rocks clipping cabin prefab (band aid)
 				 }

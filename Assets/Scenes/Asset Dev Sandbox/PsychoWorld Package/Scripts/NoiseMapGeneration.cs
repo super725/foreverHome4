@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class NoiseMapGeneration : MonoBehaviour {
 
@@ -31,9 +32,3 @@ public class NoiseMapGeneration : MonoBehaviour {
     }
 }
 
-[System.Serializable]
-public class Wave {
-    public float seed;
-    public float frequency;
-    public float amplitude;
-}
