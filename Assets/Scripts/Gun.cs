@@ -78,18 +78,23 @@ public class Gun : MonoBehaviour
         {
             if (hit.collider != null)
             {
+                Debug.Log("Hit object: " + hit.collider.gameObject.name);
                 Enemy enemy = hit.collider.gameObject.GetComponent<Enemy>();
                 if (enemy != null)
                 {
                     enemy.TakeDamage(damage);
                 }
+                else
+                {
+                    Debug.Log("Enemy not found on " + hit.collider.gameObject.name);
+                }
             }
         }
 
+        Destroy(bullet, 0.5f);
+
         canShoot = false; // Disable shooting temporarily
         StartCoroutine(EnableShootingAfterCooldown());
-
-        Destroy(bullet, 0.5f);
     }
 
     IEnumerator EnableShootingAfterCooldown()

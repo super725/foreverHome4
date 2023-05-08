@@ -4,30 +4,55 @@ using UnityEngine;
 
 public class Hitbox : MonoBehaviour
 {
-    public EnemyBehaviorSight behavior;
+    public RangedEnemyBehaviorSight behavior;
     [HideInInspector]
-    SkinnedMeshRenderer skinnedmeshRenderer;
+    public SkinnedMeshRenderer skinnedMeshRenderer;
     [HideInInspector]
     public float health;
     public float blinkIntensity;
     public float blinkDuration;
     float blinkTimer;
-    private void Start() {
-        skinnedmeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
-        if (skinnedmeshRenderer == null)
+
+    private void Start()
+    {
+        skinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        if (skinnedMeshRenderer == null)
         {
-            skinnedmeshRenderer = gameObject.AddComponent<SkinnedMeshRenderer>();
+            skinnedMeshRenderer = gameObject.AddComponent<SkinnedMeshRenderer>();
         }
-        skinnedmeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        skinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
     }
-    public void OnRaycastHit(RaycastDamage weapon, Vector3 direction){
+
+    public void OnRaycastHit(Gun weapon, Vector3 direction)
+    {
+        Debug.Log("Hitbox was hit by a bullet!");
         blinkTimer = blinkDuration;
-        behavior.TakeDamage(weapon.damage, direction);
+        TakeDamage(weapon.damage, direction);
     }
-    private void Update(){
+
+    public void TakeDamage(float damage, Vector3 direction)
+    {
+        // Apply damage logic here
+        health -= damage;
+        // Apply any other effects or behavior based on the damage
+
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        behavior.TakeDamage(health); // Notify the enemy behavior about the enemy's death
+        Destroy(gameObject); // Destroy the hitbox object
+    }
+
+    private void Update()
+    {
         blinkTimer -= Time.deltaTime;
-        float lerp = Mathf.Clamp01(blinkTimer/blinkDuration);
+        float lerp = Mathf.Clamp01(blinkTimer / blinkDuration);
         float intensity = lerp * blinkIntensity;
-        skinnedmeshRenderer.material.color = Color.red * intensity;
+        skinnedMeshRenderer.material.color = Color.red * intensity;
     }
 }
