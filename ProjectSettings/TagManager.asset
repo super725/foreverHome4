@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Interactable
+  - Floor
+  - Enemy
+  - Bullet
+  - HItbox
   layers:
   - Default
   - TransparentFX

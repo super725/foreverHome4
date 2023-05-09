@@ -13,6 +13,8 @@ public class ActivateGun : MonoBehaviour
     public TextMeshProUGUI ammoText; // Reference to the ammo text UI element.
     public TextMeshProUGUI pickupText; // Reference to the pickup text UI element.
 
+    private bool canScroll = false; // Flag to indicate whether the player can scroll through the weapons.
+
     void Start()
     {
         foreach (GameObject gun in activeGuns)
@@ -42,6 +44,8 @@ public class ActivateGun : MonoBehaviour
 
                     gunsOnFloor[index].SetActive(false);
 
+                    canScroll = true; // Set the flag to allow scrolling through weapons.
+
                     UpdateAmmoText(); // Update the ammo text when switching guns.
                 }
             }
@@ -52,46 +56,51 @@ public class ActivateGun : MonoBehaviour
             if (currentGunIndex != -1)
             {
                 activeGuns[currentGunIndex].SetActive(false);
-                gunsOnFloor[currentGunIndex].transform.position = Camera.main.transform.position + Camera.main.transform.forward * maxDistance;
+                gunsOnFloor[currentGunIndex].transform.position = Camera.main.transform.position + Camera.main.transform.forward * Mathf.Max(maxDistance, 2f);
                 gunsOnFloor[currentGunIndex].SetActive(true);
 
                 currentGunIndex = -1;
+
+                canScroll = false; // Set the flag to disallow scrolling through weapons.
 
                 UpdateAmmoText(); // Update the ammo text when dropping a gun.
             }
         }
 
-        if (Input.GetAxis("Mouse ScrollWheel") > 0f)
+        if (canScroll) // Only allow scrolling through weapons if the flag is true.
         {
-            if (currentGunIndex != -1)
+            if (Input.GetAxis("Mouse ScrollWheel") > 0f)
             {
-                activeGuns[currentGunIndex].SetActive(false);
-            }
+                if (currentGunIndex != -1)
+                {
+                    activeGuns[currentGunIndex].SetActive(false);
+                }
 
-            currentGunIndex++;
-            if (currentGunIndex >= activeGuns.Count)
+                currentGunIndex++;
+                if (currentGunIndex >= activeGuns.Count)
+                {
+                    currentGunIndex = 0;
+                }
+                activeGuns[currentGunIndex].SetActive(true);
+
+                UpdateAmmoText(); // Update the ammo text when switching guns.
+            }
+            else if (Input.GetAxis("Mouse ScrollWheel") < 0f)
             {
-                currentGunIndex = 0;
-            }
-            activeGuns[currentGunIndex].SetActive(true);
+                if (currentGunIndex != -1)
+                {
+                    activeGuns[currentGunIndex].SetActive(false);
+                }
 
-            UpdateAmmoText(); // Update the ammo text when switching guns.
-        }
-        else if (Input.GetAxis("Mouse ScrollWheel") < 0f)
-        {
-            if (currentGunIndex != -1)
-            {
-                activeGuns[currentGunIndex].SetActive(false);
-            }
+                currentGunIndex--;
+                if (currentGunIndex < 0)
+                {
+                    currentGunIndex = activeGuns.Count - 1;
+                }
+                activeGuns[currentGunIndex].SetActive(true);
 
-            currentGunIndex--;
-            if (currentGunIndex < 0)
-            {
-                currentGunIndex = activeGuns.Count - 1;
+                UpdateAmmoText(); // Update the ammo text when switching guns.
             }
-            activeGuns[currentGunIndex].SetActive(true);
-
-            UpdateAmmoText(); // Update the ammo text when switching guns.
         }
 
         if (pickupText != null)
@@ -105,21 +114,22 @@ public class ActivateGun : MonoBehaviour
                     int index = gunsOnFloor.IndexOf(hitObject);
                     if (index != -1)
                     {
-                        pickupText.text = "Press E to pick up";
+                        pickupText.gameObject.SetActive(true); // Activate the pickup text UI element.
+                        pickupText.text = "Press E to pick up " + hitObject.name; // Set the text of the pickup text UI element to indicate that the player can pick up the gun.
                     }
                     else
                     {
-                        pickupText.text = "";
+                        pickupText.gameObject.SetActive(false); // Deactivate the pickup text UI element if there is no gun to pick up.
                     }
                 }
                 else
                 {
-                    pickupText.text = "";
+                    pickupText.gameObject.SetActive(false); // Deactivate the pickup text UI element if there is no gun to pick up.
                 }
             }
             else
             {
-                pickupText.text = "";
+                pickupText.gameObject.SetActive(false); // Deactivate the pickup text UI element if the player is already holding a gun.
             }
         }
     }

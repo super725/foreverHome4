@@ -70,7 +70,11 @@ public class Gun : MonoBehaviour
 
         if (bulletRigidbody != null)
         {
-            bulletRigidbody.velocity = bulletSpawnPoint.forward * range;
+            // Calculate the direction towards the center of the screen
+            Vector3 centerDirection = (Camera.main.transform.position + Camera.main.transform.forward * range) - bulletSpawnPoint.position;
+            centerDirection.Normalize();
+
+            bulletRigidbody.velocity = centerDirection * range;
         }
 
         Ray ray = new Ray(bulletSpawnPoint.position, bulletSpawnPoint.forward);
@@ -78,18 +82,23 @@ public class Gun : MonoBehaviour
         {
             if (hit.collider != null)
             {
+                Debug.Log("Hit object: " + hit.collider.gameObject.name);
                 Enemy enemy = hit.collider.gameObject.GetComponent<Enemy>();
                 if (enemy != null)
                 {
                     enemy.TakeDamage(damage);
                 }
+                else
+                {
+                    Debug.Log("Enemy not found on " + hit.collider.gameObject.name);
+                }
             }
         }
 
+        Destroy(bullet, 0.5f);
+
         canShoot = false; // Disable shooting temporarily
         StartCoroutine(EnableShootingAfterCooldown());
-
-        Destroy(bullet, 0.5f);
     }
 
     IEnumerator EnableShootingAfterCooldown()
