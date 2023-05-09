@@ -20,13 +20,15 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private bool canUseHeadbob = true;
     [SerializeField] private bool willSlideOnSlopes = true;
     [SerializeField] private bool canZoom = true;
-    [SerializeField] private bool useStamina = true; 
+    [SerializeField] private bool useStamina = true;
+    [SerializeField] private bool canInteract = true;
 
     [Header("Controls")] 
     [SerializeField] private KeyCode sprintKey = KeyCode.LeftShift;
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
     [SerializeField] private KeyCode zoomKey = KeyCode.Mouse1;
+    [SerializeField] private KeyCode interactKey = KeyCode.F;
 
     
     [Header("Health Prameters")]
@@ -51,6 +53,11 @@ public class FirstPersonController : MonoBehaviour
     public static Action<float> OnStaminaChange;
 
 
+    [Header("Inventory Parameters")]
+     
+
+     public GameObject Hand;
+     
 
     [Header("Movement Parameters")] 
     [SerializeField]private float walkSpeed = 3.0f;
@@ -79,6 +86,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private Vector3 standingCenter = new Vector3(0,0,0);
     private bool isCrouching;
     private bool duringCrouchAnimation;
+    private float originalHeight;
     
     [Header("Headbob Parameters")]
     [SerializeField] private float walkBobSpeed = 14f;
@@ -99,6 +107,8 @@ public class FirstPersonController : MonoBehaviour
     //Sliding Parameters
     private Vector3 hitPointNormal;
 
+     
+
     private bool isSliding
     {
         get
@@ -115,13 +125,21 @@ public class FirstPersonController : MonoBehaviour
             }
         }
     }
+
+    [Header("Interaction")] 
+    [SerializeField] private Vector3 interactionRayPoint = default;
+    [SerializeField] private float interactionDistance = default;
+    [SerializeField] private LayerMask interactionLayer = default;
     
-    private Camera playerCamera;
+    
+    
+    Camera playerCamera;
     private CharacterController characterController;
     private Vector3 moveDirection;
     private Vector2 currentInput;
 
     private float rotationX = 0;
+    public Interactable focus;
 
     private void OnEnable()
     {
@@ -132,6 +150,16 @@ public class FirstPersonController : MonoBehaviour
     {
         OnTakeDamage -= ApplyDamage;
     }
+
+    void Start()
+    {
+        characterController = GetComponent<CharacterController>();
+        originalHeight = characterController.height;
+        playerCamera = Camera.main;
+
+    }
+
+    
 
     void Awake()
     {
@@ -168,9 +196,45 @@ public class FirstPersonController : MonoBehaviour
             if (useStamina)
                 HandleStamina();
 
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                ToggleCursorLock();
+            }
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit, 100))
+                {
+                  Interactable interactable = hit.collider.GetComponent<Interactable>();
+                  if (interactable != null)
+                  {
+                      SetFocus(interactable);
+                  }
+                }
+            }
+
             ApplyFinalMovements();
         }   
     }
+
+    void SetFocus(Interactable newFocus)
+    {
+        if (newFocus != focus)
+        {
+            if(focus != null)
+                focus.onDefocused();
+            
+            focus = newFocus;
+        }
+        newFocus.OnFocused(transform);
+    }
+
+    
+    
+    
 
     private void HandleMovementInput()
     {
@@ -190,6 +254,20 @@ public class FirstPersonController : MonoBehaviour
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
         
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeedX, 0);
+    }
+
+    private void ToggleCursorLock()
+    {
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     private void HandleJump()
@@ -296,6 +374,25 @@ public class FirstPersonController : MonoBehaviour
             zoomRoutine = StartCoroutine(ToggleZoom(false));
         }
     }
+
+    // private void HandleInteractionCheck()
+    // {
+    //     if (Physics.Raycast(playerCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit,
+    //             interactionDistance))
+    //     {
+    //         if (hit.collider.gameObject.layer == 6 && (currentInteractable == null || hit.collider.gameObject.GetInstanceID() != currentInteractable.GetInstanceID()))
+    //         {
+    //             hit.collider.TryGetComponent(out currentInteractable);
+    //             if(currentInteractable)
+    //                 currentInteractable.OnFocus();
+    //         }
+    //     }else if (currentInteractable)
+    //     {
+    //         currentInteractable.OnLoseFocus();
+    //         currentInteractable = null;
+    //     }
+    // }
+    
     
     
     private void ApplyFinalMovements()
@@ -317,15 +414,18 @@ public class FirstPersonController : MonoBehaviour
         duringCrouchAnimation = true;
 
         float timeElapsed = 0;
-        float targetHeight = isCrouching ? standingHeight : crouchHeight;
+        float targetHeight = originalHeight;
         float currentHeight = characterController.height;
         Vector3 targetCenter = isCrouching ? standingCenter : crouchingCenter;
         Vector3 currentCenter = characterController.center;
 
         while (timeElapsed < timetoCrouch)
         {
-            characterController.height = Mathf.Lerp(currentHeight, targetHeight, timeElapsed / timetoCrouch);
-            characterController.center = Vector3.Lerp(currentCenter, targetCenter, timeElapsed / timetoCrouch);
+            float t = timeElapsed / timetoCrouch;
+            t = t * t * (3f - 2f * t);
+            
+            characterController.height = Mathf.Lerp(currentHeight, targetHeight, t);
+            characterController.center = Vector3.Lerp(currentCenter, targetCenter, t);
             timeElapsed += Time.deltaTime;
             yield return null; 
         }
@@ -334,6 +434,7 @@ public class FirstPersonController : MonoBehaviour
         characterController.center = targetCenter;
 
         isCrouching = !isCrouching;
+        
         
         duringCrouchAnimation = false;
     }
@@ -396,4 +497,6 @@ public class FirstPersonController : MonoBehaviour
 
         regenerateStamina = null;
     }
+
+    
 }
