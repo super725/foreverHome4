@@ -70,7 +70,11 @@ public class Gun : MonoBehaviour
 
         if (bulletRigidbody != null)
         {
-            bulletRigidbody.velocity = bulletSpawnPoint.forward * range;
+            // Calculate the direction towards the center of the screen
+            Vector3 centerDirection = (Camera.main.transform.position + Camera.main.transform.forward * range) - bulletSpawnPoint.position;
+            centerDirection.Normalize();
+
+            bulletRigidbody.velocity = centerDirection * range;
         }
 
         Ray ray = new Ray(bulletSpawnPoint.position, bulletSpawnPoint.forward);

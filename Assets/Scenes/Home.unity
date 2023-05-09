@@ -1183,7 +1183,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1, y: 4, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &914251450
 MonoBehaviour:
@@ -1197,7 +1197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56d718b10d9a8ac4683a3da85545cc5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 25
+  maxHealth: 100
 --- !u!1001 &944948431
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1333,6 +1333,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2694567148247216578, guid: f89dd4231f7b9ae42aed62177a484828, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 6207641259973377260, guid: f89dd4231f7b9ae42aed62177a484828, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -7010,7 +7014,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56d718b10d9a8ac4683a3da85545cc5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 25
+  maxHealth: 100
 --- !u!65 &1255000290
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7030,7 +7034,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1, y: 4, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &1301644117 stripped
 Transform:
@@ -13228,6 +13232,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 409141573}
     m_Modifications:
     - target: {fileID: 91676516663693229, guid: c71aec0140954d24089c672ec295e32c, type: 3}
+      propertyPath: damage
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 91676516663693229, guid: c71aec0140954d24089c672ec295e32c, type: 3}
       propertyPath: ammoText
       value: 
       objectReference: {fileID: 998344613}
@@ -13352,6 +13360,10 @@ PrefabInstance:
       propertyPath: muzzleFlash
       value: 
       objectReference: {fileID: 995288687}
+    - target: {fileID: 7075020773705072494, guid: 5a99d224ee2565444a28e01f3a2581c8, type: 3}
+      propertyPath: damage
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 7075020773705072494, guid: 5a99d224ee2565444a28e01f3a2581c8, type: 3}
       propertyPath: ammoText
       value: 
