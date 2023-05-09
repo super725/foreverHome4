@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: a2781e2fd45478d4e8db208ca0724cbe
+=======
+guid: cfa7636dd0e1882499eeafee2394168d
+>>>>>>> origin/RayBranch
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

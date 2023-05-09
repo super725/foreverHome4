@@ -22,14 +22,18 @@ public class TileGeneration : MonoBehaviour
 	
 	public NoiseMapGeneration noiseMapGeneration;
 
-	private Prefab[] prefabs;
+	private bool isHome;
+	private Prefab[] staticPrefabs;
+	private Prefab[] dynamicPrefabs;
+	private Prefab[] psychoPrefabs;
+
 	//public GameObject treePrefab, spherePrefab;
 	
 	[SerializeField] private MeshRenderer tileRenderer;
 	[SerializeField] private MeshFilter meshFilter;
 	[SerializeField] private MeshCollider meshCollider;
 
-	private float tileWidth, tileDepth, scatterDensity, scatterRadius;
+	private float mapWidth, mapDepth, tileWidth, tileDepth, scatterDensity, scatterRadius;
 	private static readonly int Metallic = Shader.PropertyToID("_Metallic");
 	private static readonly int Glossiness = Shader.PropertyToID("_Glossiness");
 
@@ -47,11 +51,18 @@ public class TileGeneration : MonoBehaviour
 		scatterWave = args.scatterWave;
 		scatterRadius = args.scatterRadius;
 		scatterDensity = args.scatterDensity;
-		prefabs = args.prefabs;
-		
+		staticPrefabs = args.staticPrefabs;
+		dynamicPrefabs = args.dynamicPrefabs;
+		psychoPrefabs = args.psychoPrefabs;
+		isHome = args.isHome;
+
 		Vector3 tileSize = GetComponent<MeshRenderer>().bounds.size;
 		tileWidth = (int)tileSize.x;
 		tileDepth = (int)tileSize.z;
+
+		mapWidth = args.mapWidth;
+		mapDepth = args.mapDepth;
+		
 		StartCoroutine(nameof(GenerateTile));
 	}
 
@@ -66,31 +77,42 @@ public class TileGeneration : MonoBehaviour
 		UpdateMeshVertices(heightMap); // Use new heightmap as our vertices' y values.
 		
 		yield return 0;
+
+		// Place critical static terrain prefabs
+		for (int i = 0; i < staticPrefabs.Length; i++)
+		{
+			NonParityScatter(staticPrefabs[i], scatterDensity);
+		}
+		
+		// Place the shroomy stuff if in psycho
+		if (!isHome)
+		{
+			for (int i = 0; i < psychoPrefabs.Length; i++)
+			{
+				NonParityScatter(psychoPrefabs[i], scatterDensity);
+			}
+		}
+
+		
+		yield return 0;
+		
+		// Do this after Static prefab loading, but before dynamic prefab loading
+		BuildNavMesh(gameObject);
+		
+		yield return 0;
+		
+		// Place animate/dynamic prefabs
+		for (int i = 0; i < dynamicPrefabs.Length; i++)
+		{
+			float[,] generativeMap = GenerateScatterMap(offsetX+i, offsetZ+i);
+			ParityScatter(dynamicPrefabs[i], generativeMap, scatterRadius);
+		}
 		
 		// build a Texture2D from the height map
 		Texture2D tileTexture = BuildTexture (heightMap);
 		tileRenderer.material.mainTexture = tileTexture;
-		tileRenderer.material.SetFloat(Metallic,0.15f);
-		tileRenderer.material.SetFloat(Glossiness,0.15f);
-		
-		// Scatters prefabs randomly across a single tile. No stacking, but collisions possible atm
-		NonParityScatter(prefabs[0], scatterDensity);
-		
-		// Scatters prefabs according to Perlin Noise peaks. Keeps the same generation pattern / Uses wave data
-		float[,] scatterMap = GenerateScatterMap(offsetX, offsetZ);
-		ParityScatter(prefabs[2], scatterMap, scatterRadius);
-		
-		//List-Based prefab scattering
-		for (int i = 2; i < prefabs.Length; i++)
-		{
-			float[,] generativeMap = GenerateScatterMap(offsetX+i, offsetZ+i);
-			ParityScatter(prefabs[i], generativeMap, scatterRadius);
-		}
-		
-		yield return 0;
-
-		// Get or add the NavMeshSurface component to the game object
-		BuildNavMesh(gameObject);
+		tileRenderer.material.SetFloat(Metallic,0.05f);
+		tileRenderer.material.SetFloat(Glossiness,0.05f);
 	}
 
 	private float[,] GenerateHeightMap(float offsetX, float offsetZ) {
@@ -191,8 +213,6 @@ public class TileGeneration : MonoBehaviour
 
 		return outputArray;
 	}
-	
-	
 	private void UpdateMeshVertices(float[,] heightMap) {
 		int heightMeshDepth = heightMap.GetLength (0);
 		int heightMeshWidth = heightMap.GetLength (1);
@@ -304,39 +324,53 @@ public class TileGeneration : MonoBehaviour
 		 if (Physics.Raycast(ray, out var hit, 15f))
 		 {
 			 //Debug.DrawRay(prefabPos, hit.normal * 4, Color.red, 55f);
-			 if (hit.collider.gameObject.CompareTag("Floor"))
+
+			 // unless prefab is an enemy, prefabs must spawn atop empty ground
+			 if (hit.collider.gameObject.CompareTag("Floor") || prefab.prefab.CompareTag("Enemy"))
 			 {
+				 if (prefab.prefab.CompareTag("Rock") && Vector3.Distance(hit.point, new Vector3(mapWidth/2*tileWidth, 0.5f, mapDepth/2*mapDepth)) < 20f)
+				 {
+					 return; // Reduce chance of rocks clipping cabin prefab (band aid)
+				 }
+				 
 				 // Place our object, rotate it to face correctly, and then scale it according to a bell curve
 				 GameObject placedPrefab = Instantiate(prefab.prefab, hit.point, Quaternion.LookRotation(hit.normal), transform);
 				 placedPrefab.transform.Rotate(0, 0, Random.Range(0f,360f), Space.Self);
 				 placedPrefab.transform.Rotate(90, 0, 0, Space.Self);
-
+			 
+				 float scaleFactor = 1;
+				 switch (prefab.prefab.tag)
+				 {
+					 case "Enemy":
+						 placedPrefab.transform.Translate(0,5f,0,Space.World);
+						 break;
+					 case "Stump":
+						 scaleFactor = 3f;
+						 break;
+					 case "ColorShroom":
+						 scaleFactor = 17f;
+						 placedPrefab.transform.Translate(0,-1.5f,0,Space.Self);
+						 break;
+					 case "BigShroom":
+						 scaleFactor = 8f;
+						 placedPrefab.transform.Translate(0,-1.5f,0,Space.Self);
+						 break;
+					 case "Bush":
+						 scaleFactor = 4f;
+						 break;
+					 case "Tree" :
+						 break;
+					 case "Rock" :
+						 break;
+				 }
+				 
 				 if (prefab.useScaleCurve)
 				 {
-					 float scaleFactor = 1;
-					 switch (prefab.prefab.tag)
-					 {
-						 case "Stump":
-							 scaleFactor = 3f;
-							 break;
-						 case "ColorShroom":
-							 scaleFactor = 17f;
-							 placedPrefab.transform.Translate(0,-1.5f,0,Space.Self);
-							 break;
-						 case "BigShroom":
-							 scaleFactor = 8f;
-							 placedPrefab.transform.Translate(0,-1.5f,0,Space.Self);
-							 break;
-						 case "Bush":
-							 scaleFactor = 4f;
-							 break;
-						 case "Tree" :
-							 break;
-						 case "Rock" :
-							 //BuildNavMesh(placedPrefab);
-							 break;
-					 }
-					 placedPrefab.transform.localScale = Vector3.one * scaleFactor * (prefab.scale.Evaluate(Random.Range(0f, 1f)) + 0.5f);
+					placedPrefab.transform.localScale = Vector3.one * scaleFactor * (prefab.scale.Evaluate(Random.Range(0f, 1f)) + 0.5f);
+				 }
+				 else
+				 {
+					 placedPrefab.transform.localScale = Vector3.one * scaleFactor;
 				 }
 			  }
 		 }

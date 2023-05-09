@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 8299861879044020810}
   - component: {fileID: 1445065137796261217}
   - component: {fileID: 4083502587256849695}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FirstPersonController
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -33,7 +33,7 @@ Transform:
   m_Children:
   - {fileID: 701504194470512336}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &8299861879044020810
 CharacterController:
@@ -70,7 +70,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 65818409005827109}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afa06e49807b59e47a5c0be6a722ab1b, type: 3}
+  m_Script: {fileID: 11500000, guid: 17ded08ddfad0984ea45be61cd869764, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   canSprint: 1
@@ -141,7 +141,7 @@ GameObject:
   - component: {fileID: 701504194470512336}
   - component: {fileID: 1965012707051242061}
   - component: {fileID: 1940625673147551601}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}

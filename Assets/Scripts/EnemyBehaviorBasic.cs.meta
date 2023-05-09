@@ -3,7 +3,12 @@ guid: 6890c4de92c8b51449d7fb16e96d1fc6
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
+<<<<<<< HEAD
   defaultReferences: []
+=======
+  defaultReferences:
+  - target: {fileID: 1106721195805917976, guid: e102374383e710c499e1fa32cdc4bb7b, type: 3}
+>>>>>>> origin/RayBranch
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

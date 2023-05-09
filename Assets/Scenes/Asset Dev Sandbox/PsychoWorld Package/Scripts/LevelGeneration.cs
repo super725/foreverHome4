@@ -2,10 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class LevelGeneration : MonoBehaviour
 {
-
+    [Header("Level Type")] 
+    public bool isHome;
+    public GameObject cabinPrefab;
+    
     [Header("Level Properties")] 
     public int rawMapWidth;
     public int rawMapDepth;
@@ -13,13 +17,17 @@ public class LevelGeneration : MonoBehaviour
     public GameObject tilePrefab;
     public GameObject flatPrefab;
     public GameObject borderPrefab;
+    public GameObject centerPrefab;
     public GameObject waterPrefab;
     public GameObject waterSpecularPrefab;
     public int waterHeight;
     
     [Header("Prefab List")] 
-    public Prefab[] prefabs;
-        
+    public Prefab[] staticPrefabs;
+    public Prefab[] psychoPrefabs;
+    public Prefab[] dynamicPrefabs;
+    
+    
     [Header("Texture Properties")]
     public int tileResolution;
     public Texture2D texture1, texture2;
@@ -37,14 +45,35 @@ public class LevelGeneration : MonoBehaviour
     
     [Header("Miscellaneous")]
     public GameObject playerPrefab;
-
+    public static event Action OnReady;
+    
     private Transform myTransform;
     private Vector3 myPosition;
     
     [NonSerialized] public int tileWidth, tileDepth;
     [NonSerialized] public int mapWidth, mapDepth;
+
+
     void Start()
     {
+        BuildMap(false);
+    }
+
+    void BuildMap(bool home)
+    {
+        // Parameters up for change:
+        isHome = home;
+        
+        // Else randomly generated
+        heightWave = new Wave[3];
+        for (int i = 0; i < 3; i++)
+        {
+            heightWave[i] = new Wave(Random.Range(1f, 9999f), Random.Range(0.01f, 1.0f),  Random.Range(0.01f, 1.0f));
+        }
+        
+        rawMapWidth = Random.Range(2, 7);
+        rawMapDepth = Random.Range(2, 7);
+        
         if (borderThickness < 2)
         {
             borderThickness = 2;
@@ -62,6 +91,7 @@ public class LevelGeneration : MonoBehaviour
     }
 
     IEnumerator GenerateMap() {
+
         // for each Tile, instantiate a Tile in the correct position
         for (int xTileIndex = 0; xTileIndex < mapWidth; xTileIndex++) {
             for (int zTileIndex = 0; zTileIndex < mapDepth; zTileIndex++) {
@@ -80,18 +110,23 @@ public class LevelGeneration : MonoBehaviour
                    || (zTileIndex >= 0 && zTileIndex < borderThickness-1 || zTileIndex > mapDepth-borderThickness && zTileIndex <= mapDepth)
                    )
                 {
-                    // Flat
+                    // Flat (completely flat)
                     Instantiate (flatPrefab, tilePosition, Quaternion.identity, myTransform);
                 }
                 // 2 and 4
                 else if((xTileIndex == borderThickness-1 || xTileIndex == mapWidth-borderThickness )
                         || (zTileIndex == borderThickness-1 || zTileIndex == mapDepth-borderThickness))
                 {
-                    // Border
+                    // Border (Interpolated height)
                     Instantiate (borderPrefab, tilePosition, Quaternion.identity, myTransform);
+                }else if (xTileIndex == mapWidth/2 && zTileIndex == mapDepth/2)
+                {
+                    // Center Tile OR Level Tile, depending on whether we are in Psycho or Normal
+                    Instantiate(isHome ? centerPrefab : tilePrefab, tilePosition, Quaternion.identity, myTransform);
                 }
                 else
                 {
+                    // Level (noisemap Assets)
                     Instantiate (tilePrefab, tilePosition, Quaternion.identity, myTransform);
                 }
             }
@@ -99,13 +134,16 @@ public class LevelGeneration : MonoBehaviour
         
         yield return 0; // Raycast collision doesnt work until after the mesh generation frame
         
+        // Instantiate Player object and water planes
         Vector2 centerPos = new(mapWidth * tileWidth / 2f - (tileWidth / 2f) , mapDepth * tileDepth / 2f - (tileDepth / 2f));
         InstantiateObjectInMap(playerPrefab, centerPos.x, centerPos.y);
-        
-        yield return 0;
         Instantiate(waterPrefab, new Vector3(centerPos.x, waterHeight, centerPos.y), Quaternion.identity).transform.localScale = new Vector3(mapWidth, 1, mapDepth);
         Instantiate(waterSpecularPrefab, new Vector3(centerPos.x, waterHeight, centerPos.y), Quaternion.identity).transform.localScale = new Vector3(mapWidth, 1, mapDepth);
-        
+
+        yield return new WaitForSeconds(1);
+        // Broadcast ready state to initialize all the enemies' scripts
+        Debug.Log("Invoking Ready State");
+        OnReady?.Invoke();
     }
     
     private void InstantiateObjectInMap(GameObject prefab, float x, float y)
@@ -126,4 +164,18 @@ public class Prefab {
     public GameObject prefab;
     public bool useScaleCurve;
     public AnimationCurve scale;
+}
+
+[Serializable]
+public class Wave {
+    public float seed ;
+    public float frequency;
+    public float amplitude;
+
+    public Wave(float sd, float freq, float amp)
+    {
+        seed = sd;
+        frequency = freq; 
+        amplitude = amp;
+    }
 }
