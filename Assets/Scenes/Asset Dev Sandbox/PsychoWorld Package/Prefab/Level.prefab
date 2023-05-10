@@ -53,7 +53,6 @@ MonoBehaviour:
   flatPrefab: {fileID: 7599130829288090861, guid: 326438eff2e420c4aa5fd823f549ff2d, type: 3}
   borderPrefab: {fileID: 7599130829288090861, guid: 5f8c3ff4ec836414d80a7a7f164cf71c, type: 3}
   centerPrefab: {fileID: 7599130829288090861, guid: 5c984283f59b13949af172b2ec7929c1, type: 3}
-  wall: {fileID: 2444851169717965161, guid: c55a34e6702e24c4288d01d72911ca50, type: 3}
   waterPrefab: {fileID: 1253252997495286165, guid: 28ab203a6204400b853fcf56294ef10b, type: 3}
   waterSpecularPrefab: {fileID: 3161590181684939375, guid: a3b85ee7155343c0a5077c56fdbddf1f, type: 3}
   waterHeight: 1
