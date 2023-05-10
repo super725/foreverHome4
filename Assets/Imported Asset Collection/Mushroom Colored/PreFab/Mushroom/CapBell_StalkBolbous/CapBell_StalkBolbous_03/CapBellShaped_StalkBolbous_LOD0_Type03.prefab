@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2333080}
   - component: {fileID: 7564356346683508501}
   - component: {fileID: 6477986707368434403}
-  - component: {fileID: 4751287765380792794}
+  - component: {fileID: 3079104052501896168}
   m_Layer: 6
   m_Name: CapBellShaped_StalkBolbous_LOD0_Type03
   m_TagString: Untagged
@@ -135,7 +135,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &4751287765380792794
+--- !u!114 &3079104052501896168
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,7 +144,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 169926}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa08d4cd00bacba41a739c0f9fd99c14, type: 3}
+  m_Script: {fileID: 11500000, guid: 6d2c56d0ce88fd647900d6d674673ae9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.75
+  radius: 0.7
+  interactionTransform: {fileID: 432370}
+  item: {fileID: 11400000, guid: b49bd582ac67b1343b4eba3da3aa28bb, type: 2}

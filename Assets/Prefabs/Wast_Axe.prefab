@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5868856317996034826}
   - component: {fileID: 4377179306861850431}
   - component: {fileID: 5646598374352556126}
+  - component: {fileID: 8412821592419357275}
   m_Layer: 0
   m_Name: Wast_Axe
   m_TagString: Untagged
@@ -150,6 +151,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 0.76
   interactionTransform: {fileID: 4217299781060666535}
+--- !u!114 &8412821592419357275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2414091663673095672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d2c56d0ce88fd647900d6d674673ae9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 3
+  interactionTransform: {fileID: 0}
+  item: {fileID: 11400000, guid: 7612bc1ed4a59e547b4baeb90c238636, type: 2}
 --- !u!1 &4498337234361800650
 GameObject:
   m_ObjectHideFlags: 0

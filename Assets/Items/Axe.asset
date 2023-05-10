@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47141cee944acf34f817f1b8ae575c55, type: 3}
   m_Name: Axe
   m_EditorClassIdentifier: 
-  name: New Item
-  icon: {fileID: 0}
+  name: Axe
+  icon: {fileID: 21300000, guid: 029010c847028f946ad448c9bc202fb6, type: 3}
   isDefaultItem: 0
+  itemDropPrefab: {fileID: 2414091663673095672, guid: 1706238a01d98b74dbe989b4c436ef12, type: 3}
+  isStackable: 0

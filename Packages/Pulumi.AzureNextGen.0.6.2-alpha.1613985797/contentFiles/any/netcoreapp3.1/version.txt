@@ -1,0 +1,2 @@
+azure-nextgen
+0.6.2-alpha.1613985797+fb4b29c3

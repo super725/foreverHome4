@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47141cee944acf34f817f1b8ae575c55, type: 3}
   m_Name: Mushroom
   m_EditorClassIdentifier: 
-  name: New Item
-  icon: {fileID: 0}
+  name: Mushroom
+  icon: {fileID: 21300000, guid: 14ddcdb1cf6bbfd41903497fb28d1e21, type: 3}
   isDefaultItem: 0
+  itemDropPrefab: {fileID: 6606526013159919375, guid: 188ea9237a4eb2f4da8f6a4011cd8969, type: 3}
+  isStackable: 0
